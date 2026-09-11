@@ -1,0 +1,11 @@
+node_modules/
+dist/
+.vercel/
+coverage/
+.DS_Store
+.env*
+!.env.example
+
+# Local working files and generated handoff archives
+work/
+outputs/
