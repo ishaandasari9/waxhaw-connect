@@ -4,10 +4,12 @@ import {
   Accessibility, ArrowLeft, ArrowRight, Baby, BadgeCheck, Bookmark, BriefcaseBusiness,
   Building2, Bus, CalendarDays, Check, ChevronDown, CircleAlert, Clock3, Compass,
   ExternalLink, Eye, FileDown, Filter, Globe2, GraduationCap, HandHeart, HeartPulse,
-  Home, House, Info, Languages, Leaf, MapPin, Menu, Minus, Phone, Plus, Printer,
-  Search, ShieldCheck, Sparkles, TreePine, Users, Utensils, X, Zap,
+  Home, House, Info, Languages, Leaf, LockKeyhole, LogIn, LogOut, Mail, MapPin, Menu,
+  Minus, Phone, Plus, Printer, Search, Send, Settings2, ShieldCheck, Sparkles, Trash2,
+  TreePine, UserRound, Users, Utensils, X, Zap,
 } from 'lucide-react'
 import { categories, events, resources, sourceNotes, urgentLinks } from './data'
+import { eventInterests, getRecommendationReason, rankEventsForUser } from './eventUtils'
 
 const AppContext = createContext(null)
 
@@ -66,6 +68,12 @@ function useStoredState(key, initialValue) {
   return [value, setValue]
 }
 
+async function hashPassword(email, password) {
+  const bytes = new TextEncoder().encode(`${email.toLowerCase().trim()}:${password}`)
+  const digest = await crypto.subtle.digest('SHA-256', bytes)
+  return Array.from(new Uint8Array(digest), (byte) => byte.toString(16).padStart(2, '0')).join('')
+}
+
 function App() {
   const [saved, setSaved] = useStoredState('waxhaw-saved', [])
   const [language, setLanguage] = useStoredState('waxhaw-language', 'en')
@@ -73,8 +81,13 @@ function App() {
     text: 'normal', contrast: false, reducedMotion: false,
   })
   const [compare, setCompare] = useState([])
+  const [accounts, setAccounts] = useStoredState('waxhaw-accounts', [])
+  const [sessionId, setSessionId] = useStoredState('waxhaw-session', null)
+  const [postedEvents, setPostedEvents] = useStoredState('waxhaw-posted-events', [])
   const [toast, setToast] = useState('')
   const [online, setOnline] = useState(navigator.onLine)
+  const currentUser = accounts.find((account) => account.id === sessionId) || null
+  const allEvents = useMemo(() => [...events, ...postedEvents], [postedEvents])
 
   useEffect(() => {
     document.documentElement.lang = language
@@ -109,7 +122,65 @@ function App() {
     setCompare([...compare, id])
   }
 
-  const value = { saved, toggleSaved, compare, toggleCompare, language, setLanguage, preferences, setPreferences, setToast, t: copy[language] }
+  const register = async ({ name, email, password, interests }) => {
+    const normalizedEmail = email.toLowerCase().trim()
+    if (accounts.some((account) => account.email === normalizedEmail)) return { ok: false, error: 'An account with this email already exists.' }
+    const account = {
+      id: `resident-${Date.now()}`,
+      name: name.trim(),
+      email: normalizedEmail,
+      passwordHash: await hashPassword(normalizedEmail, password),
+      interests,
+      personalized: true,
+    }
+    setAccounts((items) => [...items, account])
+    setSessionId(account.id)
+    return { ok: true }
+  }
+
+  const login = async ({ email, password }) => {
+    const normalizedEmail = email.toLowerCase().trim()
+    const passwordHash = await hashPassword(normalizedEmail, password)
+    const account = accounts.find((item) => item.email === normalizedEmail && item.passwordHash === passwordHash)
+    if (!account) return { ok: false, error: 'That email and password do not match a local account.' }
+    setSessionId(account.id)
+    return { ok: true }
+  }
+
+  const signOut = () => {
+    setSessionId(null)
+    setToast('You’re signed out.')
+  }
+
+  const updateProfile = (changes) => {
+    if (!currentUser) return
+    setAccounts((items) => items.map((item) => item.id === currentUser.id ? { ...item, ...changes } : item))
+    setToast('Your event preferences were updated.')
+  }
+
+  const addPostedEvent = (eventItem) => {
+    const newEvent = {
+      ...eventItem,
+      id: `community-${Date.now()}`,
+      organizerId: currentUser.id,
+      organizer: currentUser.name,
+      communitySubmitted: true,
+      submittedAt: new Date().toISOString(),
+    }
+    setPostedEvents((items) => [...items, newEvent])
+    return newEvent
+  }
+
+  const removePostedEvent = (id) => {
+    setPostedEvents((items) => items.filter((item) => item.id !== id || item.organizerId !== currentUser?.id))
+    setToast('Your community event was removed.')
+  }
+
+  const value = {
+    saved, toggleSaved, compare, toggleCompare, language, setLanguage, preferences, setPreferences,
+    setToast, t: copy[language], accounts, currentUser, allEvents, register, login, signOut,
+    updateProfile, addPostedEvent, removePostedEvent,
+  }
 
   return (
     <AppContext.Provider value={value}>
@@ -124,6 +195,9 @@ function App() {
           <Route path="/resources/:resourceId" element={<ResourceDetailPage />} />
           <Route path="/finder" element={<FinderPage />} />
           <Route path="/events" element={<EventsPage />} />
+          <Route path="/events/new" element={<PostEventPage />} />
+          <Route path="/login" element={<LoginPage />} />
+          <Route path="/account" element={<AccountPage />} />
           <Route path="/saved" element={<SavedPage />} />
           <Route path="/about" element={<AboutPage />} />
           <Route path="/urgent" element={<UrgentPage />} />
@@ -146,6 +220,9 @@ function ScrollToTop() {
       '/resources': 'Resource directory | Waxhaw Connect',
       '/finder': 'Guided resource finder | Waxhaw Connect',
       '/events': 'Community events | Waxhaw Connect',
+      '/events/new': 'Post a community event | Waxhaw Connect',
+      '/login': 'Sign in | Waxhaw Connect',
+      '/account': 'Your account | Waxhaw Connect',
       '/saved': 'Your saved plan | Waxhaw Connect',
       '/about': 'Sources and methodology | Waxhaw Connect',
       '/urgent': 'Urgent support | Waxhaw Connect',
@@ -166,7 +243,7 @@ function BrandMark({ compact = false }) {
 }
 
 function Header() {
-  const { saved, language, setLanguage, preferences, setPreferences, t } = useContext(AppContext)
+  const { saved, language, setLanguage, preferences, setPreferences, currentUser, t } = useContext(AppContext)
   const [menuOpen, setMenuOpen] = useState(false)
   const [accessOpen, setAccessOpen] = useState(false)
   const location = useLocation()
@@ -187,6 +264,9 @@ function Header() {
           <button className="utility-button" onClick={() => setAccessOpen(!accessOpen)} aria-expanded={accessOpen} aria-controls="accessibility-panel">
             <Accessibility size={17} /> Accessibility
           </button>
+          <Link className="utility-button utility-account" to={currentUser ? '/account' : '/login'}>
+            {currentUser ? <UserRound size={16} /> : <LogIn size={16} />} {currentUser ? currentUser.name.split(' ')[0] : 'Sign in'}
+          </Link>
         </div>
       </div>
       <header className="site-header">
@@ -350,9 +430,9 @@ function SavedPreview() {
 }
 
 function EventsPreview() {
-  const { t } = useContext(AppContext)
+  const { allEvents, t } = useContext(AppContext)
   return (
-    <div className="events-preview"><div className="mini-heading"><h2><CalendarDays /> {t.upcoming}</h2><Link to="/events">View all</Link></div>{[...events].sort((a, b) => a.date.localeCompare(b.date)).slice(0, 3).map((event) => <EventRow key={event.id} event={event} />)}</div>
+    <div className="events-preview"><div className="mini-heading"><h2><CalendarDays /> {t.upcoming}</h2><Link to="/events">View all</Link></div>{[...allEvents].sort((a, b) => a.date.localeCompare(b.date)).slice(0, 3).map((event) => <EventRow key={event.id} event={event} />)}</div>
   )
 }
 
@@ -492,7 +572,14 @@ function FinderPage() {
 
 function EventsPage() {
   const [filter, setFilter] = useState('All')
-  const filtered = [...(filter === 'All' ? events : events.filter((event) => event.category === filter))].sort((a, b) => a.date.localeCompare(b.date))
+  const { allEvents, currentUser, removePostedEvent, setToast } = useContext(AppContext)
+  const [feed, setFeed] = useState(currentUser?.personalized && currentUser.interests?.length ? 'For you' : 'All events')
+  const [params] = useSearchParams()
+  useEffect(() => {
+    if (params.get('posted') === '1') setToast('Your event is now listed as a community submission.')
+  }, [params, setToast])
+  const rankedEvents = feed === 'For you' ? rankEventsForUser(allEvents, currentUser?.interests) : [...allEvents].sort((a, b) => a.date.localeCompare(b.date))
+  const filtered = filter === 'All' ? rankedEvents : rankedEvents.filter((event) => event.category === filter)
   const downloadCalendar = (eventItem) => {
     const date = eventItem.date.replaceAll('-', '')
     const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART;VALUE=DATE:${date}\nSUMMARY:${eventItem.title}\nLOCATION:${eventItem.location}\nDESCRIPTION:${eventItem.description}\nEND:VEVENT\nEND:VCALENDAR`
@@ -504,10 +591,99 @@ function EventsPage() {
   }
   return (
     <>
-      <PageHero eyebrow="Community calendar" title="Show up for what matters" intro="Officially listed events, programs and public meetings that bring Waxhaw neighbors together." compact />
-      <section className="section events-page"><div className="filter-pills" aria-label="Filter events">{['All', ...new Set(events.map((event) => event.category))].map((item) => <button key={item} className={filter === item ? 'is-active' : ''} onClick={() => setFilter(item)} aria-pressed={filter === item}>{item}</button>)}</div><div className="event-list">{filtered.map((event) => { const date = new Date(`${event.date}T12:00:00`); return <article key={event.id} className="event-card"><time dateTime={event.date}><strong>{date.toLocaleDateString('en-US', { month: 'short' })}</strong><span>{date.getDate()}</span><small>{date.toLocaleDateString('en-US', { weekday: 'short' })}</small></time><div><span className="event-category">{event.category}</span><h2>{event.title}</h2><p>{event.description}</p><div className="event-facts"><span><Clock3 /> {event.time}</span><span><MapPin /> {event.location}</span><span><Accessibility /> {event.accessibility}</span></div></div><div className="event-actions"><button className="button button--secondary" onClick={() => downloadCalendar(event)}><CalendarDays /> Add to calendar</button><a className="text-link" href={event.sourceUrl} target="_blank" rel="noreferrer">Official event details <ExternalLink /></a></div></article> })}</div><p className="freshness-note"><Info /> Event details can change. Each event links to its official source so you can confirm before leaving home.</p></section>
+      <PageHero eyebrow="Community calendar" title="Show up for what matters" intro="Official listings and neighbor-posted events that bring Waxhaw together." compact>
+        <div className="hero-actions"><Link className="button button--primary" to="/events/new"><Plus /> Post an event</Link>{!currentUser && <Link className="button button--secondary" to="/login?returnTo=/events">Sign in for recommendations</Link>}</div>
+      </PageHero>
+      <section className="section events-page">
+        {currentUser ? (
+          <section className="recommendation-bar" aria-labelledby="recommendation-title">
+            <span className="recommendation-icon"><Sparkles /></span>
+            <div><span className="eyebrow">Your calendar</span><h2 id="recommendation-title">{currentUser.personalized ? `Picked for ${currentUser.name.split(' ')[0]}` : 'Personalization is paused'}</h2><p>{currentUser.personalized ? (currentUser.interests?.length ? `Matching your interests in ${currentUser.interests.join(', ')}.` : 'Choose a few interests to start getting personal recommendations.') : 'Your calendar is in chronological order until you turn recommendations back on.'}</p></div>
+            <Link className="text-link" to="/account"><Settings2 /> Edit interests</Link>
+          </section>
+        ) : (
+          <section className="recommendation-bar recommendation-bar--guest" aria-labelledby="recommendation-title">
+            <span className="recommendation-icon"><Sparkles /></span><div><span className="eyebrow">Make it yours</span><h2 id="recommendation-title">Find more events you’ll love</h2><p>Choose your interests and we’ll bring the best matches to the top.</p></div><Link className="button button--secondary" to="/login?returnTo=/events">Create a profile</Link>
+          </section>
+        )}
+        <div className="event-controls">
+          {currentUser?.personalized && currentUser?.interests?.length > 0 && <div className="feed-tabs" aria-label="Choose event feed">{['For you', 'All events'].map((item) => <button key={item} className={feed === item ? 'is-active' : ''} onClick={() => setFeed(item)} aria-pressed={feed === item}>{item}</button>)}</div>}
+          <div className="filter-pills" aria-label="Filter events">{['All', ...new Set(allEvents.map((event) => event.category))].map((item) => <button key={item} className={filter === item ? 'is-active' : ''} onClick={() => setFilter(item)} aria-pressed={filter === item}>{item}</button>)}</div>
+        </div>
+        <div className="event-list">{filtered.map((event) => {
+          const date = new Date(`${event.date}T12:00:00`)
+          const reason = feed === 'For you' ? getRecommendationReason(event, currentUser?.interests) : ''
+          return <article key={event.id} className="event-card"><time dateTime={event.date}><strong>{date.toLocaleDateString('en-US', { month: 'short' })}</strong><span>{date.getDate()}</span><small>{date.toLocaleDateString('en-US', { weekday: 'short' })}</small></time><div><div className="event-labels"><span className="event-category">{event.category}</span>{event.communitySubmitted && <span className="community-badge"><Users /> Community submitted</span>}{reason && <span className="match-reason"><Sparkles /> {reason}</span>}</div><h2>{event.title}</h2><p>{event.description}</p><div className="event-facts"><span><Clock3 /> {event.time}</span><span><MapPin /> {event.location}</span><span><Accessibility /> {event.accessibility}</span></div>{event.communitySubmitted && <small className="submitted-by">Posted by {event.organizer}. Confirm details with the organizer before attending.</small>}</div><div className="event-actions"><button className="button button--secondary" onClick={() => downloadCalendar(event)}><CalendarDays /> Add to calendar</button>{event.sourceUrl && <a className="text-link" href={event.sourceUrl} target="_blank" rel="noreferrer">{event.communitySubmitted ? 'Event link' : 'Official event details'} <ExternalLink /></a>}{currentUser && event.communitySubmitted && event.organizerId === currentUser.id && <button className="text-button text-button--danger" onClick={() => removePostedEvent(event.id)}><Trash2 /> Remove my event</button>}</div></article>
+        })}</div>
+        {!filtered.length && <div className="empty-state"><CalendarDays /><h2>No events match this view</h2><p>Try another category or switch back to all events.</p></div>}
+        <p className="freshness-note"><Info /> Official events link to their original source. Community submissions are clearly labeled and should be confirmed with their organizer.</p>
+      </section>
     </>
   )
+}
+
+function InterestPicker({ selected, onChange }) {
+  const toggle = (interest) => onChange(selected.includes(interest) ? selected.filter((item) => item !== interest) : [...selected, interest])
+  return <fieldset className="interest-picker"><legend>What kinds of events interest you?</legend><p>Choose as many as you like. You can change these later.</p><div>{eventInterests.map((interest) => <label key={interest} className={selected.includes(interest) ? 'is-selected' : ''}><input type="checkbox" checked={selected.includes(interest)} onChange={() => toggle(interest)} /><span>{interest}</span><Check /></label>)}</div></fieldset>
+}
+
+function LoginPage() {
+  const { accounts, currentUser, login, register } = useContext(AppContext)
+  const [params] = useSearchParams()
+  const navigate = useNavigate()
+  const [mode, setMode] = useState(accounts.length ? 'signin' : 'create')
+  const [form, setForm] = useState({ name: '', email: '', password: '', interests: ['Family', 'Festival'] })
+  const [error, setError] = useState('')
+  const [busy, setBusy] = useState(false)
+  const rawReturnTo = params.get('returnTo') || '/events'
+  const returnTo = rawReturnTo.startsWith('/') && !rawReturnTo.startsWith('//') ? rawReturnTo : '/events'
+
+  useEffect(() => { if (currentUser) navigate(returnTo, { replace: true }) }, [currentUser, navigate, returnTo])
+
+  const submit = async (event) => {
+    event.preventDefault()
+    setError('')
+    if (form.password.length < 8) return setError('Use at least 8 characters for your password.')
+    if (mode === 'create' && form.interests.length === 0) return setError('Choose at least one event interest.')
+    setBusy(true)
+    const result = mode === 'create' ? await register(form) : await login(form)
+    setBusy(false)
+    if (!result.ok) return setError(result.error)
+    navigate(returnTo, { replace: true })
+  }
+
+  return <section className="section auth-shell"><div className="auth-intro"><span className="feature-icon"><Sparkles /></span><span className="eyebrow">Your Waxhaw</span><h1>A calendar that gets to know you</h1><p>Save your interests, see better event matches, and share gatherings with the community.</p><ul><li><Check /> Recommendations based only on interests you choose</li><li><Check /> Clear reasons for every suggested event</li><li><Check /> Your demo profile stays in this browser</li></ul></div><form className="auth-form" onSubmit={submit}><div className="auth-tabs" role="tablist" aria-label="Account access"><button type="button" role="tab" aria-selected={mode === 'signin'} className={mode === 'signin' ? 'is-active' : ''} onClick={() => { setMode('signin'); setError('') }}>Sign in</button><button type="button" role="tab" aria-selected={mode === 'create'} className={mode === 'create' ? 'is-active' : ''} onClick={() => { setMode('create'); setError('') }}>Create account</button></div><div className="auth-form__heading"><h2>{mode === 'create' ? 'Create your local profile' : 'Welcome back'}</h2><p>{mode === 'create' ? 'A few details will make your event feed useful from day one.' : 'Sign in to see your interests and community posts.'}</p></div>{mode === 'create' && <label>Full name<span className="input-wrap"><UserRound /><input required autoComplete="name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Jordan Lee" /></span></label>}<label>Email address<span className="input-wrap"><Mail /><input required type="email" autoComplete="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} placeholder="you@example.com" /></span></label><label>Password<span className="input-wrap"><LockKeyhole /><input required minLength="8" type="password" autoComplete={mode === 'create' ? 'new-password' : 'current-password'} value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} placeholder="At least 8 characters" /></span></label>{mode === 'create' && <InterestPicker selected={form.interests} onChange={(interests) => setForm({ ...form, interests })} />}{error && <p className="form-error" role="alert"><CircleAlert /> {error}</p>}<button className="button button--primary button--wide" disabled={busy}>{busy ? 'Please wait…' : mode === 'create' ? 'Create account' : 'Sign in'} <ArrowRight /></button><p className="local-data-note"><ShieldCheck /> This prototype stores account data on this device. Production launch will require a secure authentication service.</p></form></section>
+}
+
+function AccountPage() {
+  const { currentUser, signOut, updateProfile } = useContext(AppContext)
+  const navigate = useNavigate()
+  const [interests, setInterests] = useState(currentUser?.interests || [])
+  const [personalized, setPersonalized] = useState(currentUser?.personalized ?? true)
+  if (!currentUser) return <SignInRequired title="Sign in to manage your profile" intro="Your interests and event posts are tied to your local account." returnTo="/account" />
+  const save = (event) => { event.preventDefault(); updateProfile({ interests, personalized }) }
+  const logout = () => { signOut(); navigate('/events') }
+  return <><PageHero eyebrow="Your account" title={`Hello, ${currentUser.name.split(' ')[0]}`} intro="Control what shapes your recommendations and manage your community participation." compact /><section className="section account-layout"><form className="profile-panel" onSubmit={save}><div className="profile-identity"><span><UserRound /></span><div><h2>{currentUser.name}</h2><p>{currentUser.email}</p></div></div><label className="personalization-switch"><span><strong>Personalized event feed</strong><small>Bring your selected interests to the top of the calendar.</small></span><input type="checkbox" checked={personalized} onChange={(event) => setPersonalized(event.target.checked)} /></label><InterestPicker selected={interests} onChange={setInterests} /><div className="form-actions"><button className="button button--primary">Save preferences</button><button type="button" className="button button--secondary" onClick={logout}><LogOut /> Sign out</button></div></form><aside className="account-aside"><Sparkles /><h2>How recommendations work</h2><p>Waxhaw Connect compares the categories you choose with each event’s category. Matches move higher in your feed and always include a plain-language reason.</p><p>We do not infer sensitive traits or track activity across other websites.</p><Link className="text-link" to="/events">See my event feed <ArrowRight /></Link></aside></section></>
+}
+
+function SignInRequired({ title, intro, returnTo }) {
+  return <section className="section sign-in-required"><span className="feature-icon"><LockKeyhole /></span><span className="eyebrow">Account required</span><h1>{title}</h1><p>{intro}</p><div><Link className="button button--primary" to={`/login?returnTo=${encodeURIComponent(returnTo)}`}>Sign in or create account <ArrowRight /></Link><Link className="button button--secondary" to="/events">Back to events</Link></div></section>
+}
+
+function PostEventPage() {
+  const { currentUser, addPostedEvent } = useContext(AppContext)
+  const navigate = useNavigate()
+  const today = new Date().toISOString().slice(0, 10)
+  const [form, setForm] = useState({ title: '', date: '', startTime: '', endTime: '', location: '', category: 'Family', description: '', accessibility: '', sourceUrl: '' })
+  if (!currentUser) return <SignInRequired title="Sign in to post an event" intro="An account helps neighbors know who shared the listing and lets you manage it later." returnTo="/events/new" />
+  const update = (field) => (event) => setForm({ ...form, [field]: event.target.value })
+  const submit = (event) => {
+    event.preventDefault()
+    const formatTime = (value) => new Date(`2000-01-01T${value}`).toLocaleTimeString('en-US', { hour: 'numeric', minute: '2-digit' })
+    addPostedEvent({ title: form.title.trim(), date: form.date, time: `${formatTime(form.startTime)}${form.endTime ? `-${formatTime(form.endTime)}` : ''}`, location: form.location.trim(), category: form.category, description: form.description.trim(), accessibility: form.accessibility.trim() || 'Contact the organizer for accessibility details.', sourceUrl: form.sourceUrl.trim() })
+    navigate('/events?posted=1')
+  }
+  return <><PageHero eyebrow="Community submission" title="Post an event" intro="Share a gathering, class, meeting or activity with Waxhaw neighbors." compact /><section className="section post-event-layout"><form className="event-form" onSubmit={submit}><div className="form-section"><span>01</span><div><h2>Event basics</h2><p>Use a clear title and choose the closest category.</p><label>Event title<input required maxLength="80" value={form.title} onChange={update('title')} placeholder="Neighborhood garden workshop" /></label><label>Category<select value={form.category} onChange={update('category')}>{eventInterests.map((interest) => <option key={interest}>{interest}</option>)}</select></label><label>Description<textarea required maxLength="400" rows="5" value={form.description} onChange={update('description')} placeholder="What will happen, who is it for, and what should people bring?" /><small>{form.description.length}/400</small></label></div></div><div className="form-section"><span>02</span><div><h2>When and where</h2><div className="form-row"><label>Date<input required min={today} type="date" value={form.date} onChange={update('date')} /></label><label>Starts<input required type="time" value={form.startTime} onChange={update('startTime')} /></label><label>Ends (optional)<input type="time" value={form.endTime} min={form.startTime} onChange={update('endTime')} /></label></div><label>Location<input required maxLength="120" value={form.location} onChange={update('location')} placeholder="Venue name and street address" /></label></div></div><div className="form-section"><span>03</span><div><h2>Help neighbors plan</h2><label>Accessibility details<textarea rows="3" maxLength="220" value={form.accessibility} onChange={update('accessibility')} placeholder="Accessible entrance, parking, seating, interpreters, or who to contact" /></label><label>Event website (optional)<input type="url" value={form.sourceUrl} onChange={update('sourceUrl')} placeholder="https://example.org/event" /></label></div></div><div className="submission-check"><ShieldCheck /><div><strong>Community-submitted listing</strong><p>Your event will be labeled with your profile name and kept separate from verified official listings. You can remove it from the calendar at any time.</p></div></div><div className="form-actions form-actions--end"><Link className="button button--secondary" to="/events">Cancel</Link><button className="button button--primary"><Send /> Publish event</button></div></form><aside className="posting-guide"><h2>Before you post</h2><ol><li><span>1</span><p><strong>Check the details.</strong> Dates and locations are the organizer’s responsibility.</p></li><li><span>2</span><p><strong>Make it inclusive.</strong> Describe accessibility, cost and who the event welcomes.</p></li><li><span>3</span><p><strong>Keep it local.</strong> Events should serve Waxhaw or nearby Union County residents.</p></li></ol><p className="local-data-note"><Info /> In this prototype, your event is saved only in this browser.</p></aside></section></>
 }
 
 function SavedPage() {

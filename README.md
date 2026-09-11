@@ -37,6 +37,9 @@ The project is configured for Vercel as a Vite single-page application. Connect 
 - Text-size, high-contrast and reduced-motion controls
 - Live open/closed indicators when reliable hours are available
 - Event filtering and downloadable calendar files
+- Local demo accounts with sign-in, sign-out and editable event interests
+- Explainable event recommendations based only on interests residents choose
+- Authenticated community event posting with clear source labels and owner removal
 - Source-verification dates and direct original-source links
 - Urgent-help pathway separated from everyday services
 - Offline app-shell caching for unreliable conference internet
@@ -61,3 +64,7 @@ The interface targets WCAG 2.2 Level AA practices: semantic landmarks, a skip li
 ## Data note
 
 The directory was reviewed on September 11, 2026 using official Town of Waxhaw, Union County, school-system and provider sources. Community information changes. The interface intentionally tells users to confirm current hours, eligibility and availability with each provider.
+
+## Prototype account note
+
+Accounts, sessions, interests and community-submitted events are stored only in the current browser for this front-end prototype. Passwords are one-way hashed before local storage, but local browser storage is not a production authentication system. A public launch should connect these flows to a secure server-side identity provider and moderated event database.
