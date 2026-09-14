@@ -81,11 +81,16 @@ function deferredSubscription(start) {
   }
 }
 
-export function subscribeToAuth(onUser) {
+/**
+ * onUnavailable fires when the SDK cannot be reached at all, so the interface can
+ * say so plainly instead of offering a sign-in form that cannot work.
+ */
+export function subscribeToAuth(onUser, onUnavailable) {
   return deferredSubscription(async (register) => {
     const services = await getServices()
     if (!services) {
-      onUser(null)
+      if (onUnavailable) onUnavailable()
+      else onUser(null)
       return
     }
     const { onAuthStateChanged } = await import('firebase/auth')

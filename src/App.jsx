@@ -88,10 +88,10 @@ function App() {
   const [toast, setToast] = useState('')
   const [online, setOnline] = useState(navigator.onLine)
 
-  useEffect(() => subscribeToAuth((user) => {
-    setAuthUser(user)
-    setAuthStatus(isBackendConfigured ? 'ready' : 'unavailable')
-  }), [])
+  useEffect(() => subscribeToAuth(
+    (user) => { setAuthUser(user); setAuthStatus('ready') },
+    () => { setAuthUser(null); setAuthStatus('unavailable') },
+  ), [])
 
   useEffect(() => {
     if (!authUser) {
