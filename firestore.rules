@@ -1,0 +1,57 @@
+rules_version = '2';
+
+// Waxhaw Connect access rules.
+//
+// Two collections, two very different audiences:
+//   profiles/{uid}        private to the resident it belongs to
+//   communityEvents/{id}  readable by anyone, writable only by its author
+//
+// Residents browse the calendar without an account, so community events are
+// public read on purpose. Nothing else is.
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    function signedIn() {
+      return request.auth != null;
+    }
+
+    function owns(uid) {
+      return signedIn() && request.auth.uid == uid;
+    }
+
+    match /profiles/{uid} {
+      allow read, create, update: if owns(uid);
+      allow delete: if owns(uid);
+    }
+
+    match /communityEvents/{eventId} {
+      function validEvent(data) {
+        return data.title is string && data.title.size() > 0 && data.title.size() <= 80
+          && data.description is string && data.description.size() > 0 && data.description.size() <= 400
+          && data.location is string && data.location.size() > 0 && data.location.size() <= 120
+          && data.accessibility is string && data.accessibility.size() <= 260
+          && data.date is string && data.date.size() == 10
+          && data.time is string && data.time.size() <= 40
+          && data.category is string && data.category.size() <= 40
+          && data.organizer is string && data.organizer.size() <= 80
+          && data.sourceUrl is string && data.sourceUrl.size() <= 300;
+      }
+
+      allow read: if true;
+      allow create: if signedIn()
+        && request.resource.data.organizerId == request.auth.uid
+        && validEvent(request.resource.data);
+      allow update: if signedIn()
+        && resource.data.organizerId == request.auth.uid
+        && request.resource.data.organizerId == request.auth.uid
+        && validEvent(request.resource.data);
+      allow delete: if signedIn() && resource.data.organizerId == request.auth.uid;
+    }
+
+    // Anything not named above is closed.
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
