@@ -12,7 +12,7 @@
   --forest: oklch(36% 0.075 165);
   --forest-dark: oklch(27% 0.064 165);
   --forest-light: oklch(92% 0.035 157);
-  --clay: oklch(58% 0.15 38);
+  --clay: oklch(56% 0.15 38); /* 4.84:1 on --surface; 58% failed AA at 4.45:1 */
   --clay-dark: oklch(48% 0.14 35);
   --clay-light: oklch(94% 0.035 35);
   --paper: oklch(98% 0.012 88);
@@ -283,7 +283,7 @@ h3 { line-height: 1.2; }
 .resource-card h2 a { text-decoration: none; }
 .resource-card h2 a:hover { text-decoration: underline; text-underline-offset: 3px; }
 .resource-card p { margin: 0; color: var(--ink-soft); font-size: .84rem; max-width: 65ch; }
-.tag-list { display: flex; flex-wrap: wrap; gap: .35rem; }
+.tag-list { display: flex; flex-wrap: wrap; align-items: flex-start; gap: .35rem; }
 .tag-list span { padding: .2rem .45rem; background: var(--paper-deep); border-radius: 2rem; font-size: .65rem; }
 .resource-card__actions { display: flex; align-items: center; justify-content: flex-end; gap: .8rem; flex-wrap: wrap; }
 .save-button { min-height: 2.45rem; display: inline-flex; align-items: center; gap: .35rem; padding: .4rem .6rem; background: transparent; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); cursor: pointer; font-size: .72rem; font-weight: 700; }
@@ -637,6 +637,11 @@ footer { background: var(--forest-dark); color: var(--paper); padding: 3rem max(
   .popular-searches { justify-content: flex-start; text-align: left; }
   .urgent-band { padding-inline: .75rem; }
   .urgent-band__intro { align-items: flex-start; }
+  /* Stack the crisis numbers instead of hiding the third one behind a sideways
+     scroll. Every number stays on screen without being discovered. */
+  .urgent-band__links { display: grid; grid-template-columns: 1fr; overflow-x: visible; }
+  .urgent-band__links a { min-width: 0; border-left: 0; border-top: 1px solid oklch(80% .07 35); }
+  .urgent-band__links a:first-child { border-top: 0; }
   .category-section { padding-block: 2rem; }
   .section-heading { align-items: start; }
   .section-heading > a { font-size: 0; }
