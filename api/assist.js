@@ -7,7 +7,7 @@ import { resources, categories } from '../src/data.js'
  * ever reaches the page as prose about a service.
  */
 
-const MODEL = 'gemini-2.5-flash-lite'
+const MODEL = 'gemini-3.5-flash-lite'
 const MAX_QUESTION = 300
 const MAX_PASTE = 2000
 const MAX_MATCHES = 4

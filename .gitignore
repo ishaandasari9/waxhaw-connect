@@ -10,3 +10,4 @@ coverage/
 work/
 outputs/
 Claude outputs/
+.vercel
