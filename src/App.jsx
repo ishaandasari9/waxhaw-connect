@@ -15,6 +15,7 @@ import {
   createAccount, isBackendConfigured, loadProfile, publishCommunityEvent, removeCommunityEvent,
   saveProfile, signInWithEmail, signOutCurrentUser, subscribeToAuth, subscribeToCommunityEvents,
 } from './backend'
+import AssistPanel from './AssistPanel.jsx'
 
 const AppContext = createContext(null)
 
@@ -508,6 +509,7 @@ function ResourcesPage() {
       <PageHero eyebrow="Resource directory" title="Find the right support" intro="Search trusted organizations, programs and services serving Waxhaw and Union County." compact>
         <form className="directory-search" onSubmit={submitSearch} role="search"><label htmlFor="directory-query">What do you need?</label><div><Search /><input id="directory-query" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Try food, rides, child care or benefits" /><button className="button button--primary">Search</button></div></form>
       </PageHero>
+      <AssistPanel renderResource={(resource) => <ResourceCard resource={resource} compact />} />
       <section className="directory-layout section">
       <button className="filter-toggle" onClick={() => setFiltersOpen(!filtersOpen)} aria-expanded={filtersOpen}><Filter /> Filters <ChevronDown /></button>
       <aside className={`filters ${filtersOpen ? 'filters--open' : ''}`} aria-label="Resource filters">
