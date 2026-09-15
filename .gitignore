@@ -9,3 +9,4 @@ coverage/
 # Local working files and generated handoff archives
 work/
 outputs/
+Claude outputs/
