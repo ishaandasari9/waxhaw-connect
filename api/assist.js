@@ -7,7 +7,7 @@ import { resources, categories } from '../src/data.js'
  * ever reaches the page as prose about a service.
  */
 
-const MODEL = 'claude-haiku-4-5-20251001'
+const MODEL = 'gemini-2.5-flash-lite'
 const MAX_QUESTION = 300
 const MAX_PASTE = 2000
 const MAX_MATCHES = 4
@@ -71,27 +71,27 @@ async function callModel(system, userText) {
   const controller = new AbortController()
   const timer = setTimeout(() => controller.abort(), TIMEOUT_MS)
   try {
-    const response = await fetch('https://api.anthropic.com/v1/messages', {
+    const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
       method: 'POST',
       signal: controller.signal,
       headers: {
         'content-type': 'application/json',
-        'anthropic-version': '2023-06-01',
-        'x-api-key': process.env.ANTHROPIC_API_KEY,
+        'x-goog-api-key': process.env.GEMINI_API_KEY,
       },
       body: JSON.stringify({
-        model: MODEL,
-        max_tokens: 600,
-        system,
-        messages: [{ role: 'user', content: userText }],
+        systemInstruction: { parts: [{ text: system }] },
+        contents: [{ role: 'user', parts: [{ text: userText }] }],
+        generationConfig: {
+          responseMimeType: 'application/json',
+          maxOutputTokens: 600,
+        },
       }),
     })
     if (!response.ok) return null
     const payload = await response.json()
-    const text = (payload.content || [])
-      .filter((block) => block.type === 'text')
-      .map((block) => block.text)
-      .join('')
+    const parts = payload.candidates?.[0]?.content?.parts
+    if (!Array.isArray(parts)) return null
+    const text = parts.map((part) => part.text || '').join('')
     return JSON.parse(text.replace(/```json|```/g, '').trim())
   } catch (error) {
     return null
@@ -105,7 +105,7 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'POST')
     return res.status(405).json({ ok: false })
   }
-  if (!process.env.ANTHROPIC_API_KEY) return res.status(200).json({ ok: false })
+  if (!process.env.GEMINI_API_KEY) return res.status(200).json({ ok: false })
 
   const ip = (req.headers['x-forwarded-for'] || '').split(',')[0].trim() || 'unknown'
   if (overLimit(ip)) return res.status(429).json({ ok: false })
