@@ -10,6 +10,9 @@ import { describePlanRequest, normalizePlanInput, parseJsonReply, sanitizePlan }
  */
 
 const MODEL = 'gemini-3.5-flash-lite'
+/* Free-tier keys only get Google Search grounding on the 2.5 models, so the
+   planner's search step runs there. Override with PLAN_MODEL in Vercel. */
+const PLAN_MODEL = process.env.PLAN_MODEL || 'gemini-2.5-flash-lite'
 const MAX_QUESTION = 300
 const MAX_PASTE = 2000
 const MAX_MATCHES = 4
@@ -93,12 +96,12 @@ Rules:
  * Returns { data, text, metadata } or null. Grounded calls ask for JSON output
  * first and fall back to prompt-only JSON if the API rejects that combination.
  */
-async function callModel(system, userText, { search = false, timeout = TIMEOUT_MS, maxTokens = 600 } = {}) {
+async function callModel(system, userText, { search = false, timeout = TIMEOUT_MS, maxTokens = 600, model = MODEL } = {}) {
   const attempt = async (jsonMode) => {
     const controller = new AbortController()
     const timer = setTimeout(() => controller.abort(), timeout)
     try {
-      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${MODEL}:generateContent`, {
+      const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
         method: 'POST',
         signal: controller.signal,
         headers: {
@@ -118,7 +121,7 @@ async function callModel(system, userText, { search = false, timeout = TIMEOUT_M
       if (!response.ok) {
         /* Logged for Vercel runtime logs. Google's error body never contains the key. */
         const detail = await response.text().catch(() => '')
-        console.error(`[assist] Gemini ${response.status} (search=${search}, json=${jsonMode}): ${detail.slice(0, 500)}`)
+        console.error(`[assist] Gemini ${response.status} (model=${model}, search=${search}, json=${jsonMode}): ${detail.slice(0, 500)}`)
         if (response.status === 400 && jsonMode && search) return 'retry'
         return null
       }
@@ -172,11 +175,20 @@ export default async function handler(req, res) {
   if (mode === 'plan') {
     const plan = normalizePlanInput(body.input)
     if (!plan) return res.status(400).json({ ok: false })
-    const result = await callModel(PLAN_SYSTEM, describePlanRequest(plan), {
+    const request = describePlanRequest(plan)
+    let result = await callModel(PLAN_SYSTEM, request, {
       search: true,
       timeout: PLAN_TIMEOUT_MS,
       maxTokens: 8192,
+      model: PLAN_MODEL,
     })
+    /* If search is unavailable (quota, outage), still give the resident a plan.
+       With no grounding metadata, sanitizePlan drops the examples on its own
+       and the page explains why. */
+    if (!result) {
+      console.error('[assist] Grounded plan failed, retrying without search')
+      result = await callModel(PLAN_SYSTEM, request, { timeout: 15000, maxTokens: 8192 })
+    }
     if (!result) return res.status(200).json({ ok: false })
     const cleaned = sanitizePlan({
       reply: result.data,
