@@ -115,16 +115,29 @@ async function callModel(system, userText, { search = false, timeout = TIMEOUT_M
           },
         }),
       })
-      if (response.status === 400 && jsonMode && search) return 'retry'
-      if (!response.ok) return null
+      if (!response.ok) {
+        /* Logged for Vercel runtime logs. Google's error body never contains the key. */
+        const detail = await response.text().catch(() => '')
+        console.error(`[assist] Gemini ${response.status} (search=${search}, json=${jsonMode}): ${detail.slice(0, 500)}`)
+        if (response.status === 400 && jsonMode && search) return 'retry'
+        return null
+      }
       const payload = await response.json()
       const candidate = payload.candidates?.[0]
       const parts = candidate?.content?.parts
-      if (!Array.isArray(parts)) return null
+      if (!Array.isArray(parts)) {
+        console.error(`[assist] No content (finishReason=${candidate?.finishReason}, blocked=${payload.promptFeedback?.blockReason || 'no'})`)
+        return null
+      }
       const text = parts.map((part) => part.text || '').join('')
       const data = parseJsonReply(text)
-      return data ? { data, text, metadata: candidate.groundingMetadata || null } : null
+      if (!data) {
+        console.error(`[assist] Unparseable reply (finishReason=${candidate.finishReason}, length=${text.length}): ${text.slice(0, 300)}`)
+        return null
+      }
+      return { data, text, metadata: candidate.groundingMetadata || null }
     } catch (error) {
+      console.error(`[assist] Request failed: ${error.name === 'AbortError' ? `timed out after ${timeout}ms` : error.message}`)
       return null
     } finally {
       clearTimeout(timer)
@@ -140,7 +153,10 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'POST')
     return res.status(405).json({ ok: false })
   }
-  if (!process.env.GEMINI_API_KEY) return res.status(200).json({ ok: false })
+  if (!process.env.GEMINI_API_KEY) {
+    console.error('[assist] GEMINI_API_KEY is not set')
+    return res.status(200).json({ ok: false })
+  }
 
   let body
   try {
@@ -159,7 +175,7 @@ export default async function handler(req, res) {
     const result = await callModel(PLAN_SYSTEM, describePlanRequest(plan), {
       search: true,
       timeout: PLAN_TIMEOUT_MS,
-      maxTokens: 2048,
+      maxTokens: 8192,
     })
     if (!result) return res.status(200).json({ ok: false })
     const cleaned = sanitizePlan({
@@ -168,7 +184,10 @@ export default async function handler(req, res) {
       metadata: result.metadata,
       categories: eventInterests,
     })
-    if (!cleaned.steps.length) return res.status(200).json({ ok: false })
+    if (!cleaned.steps.length) {
+      console.error('[assist] Plan had no usable steps')
+      return res.status(200).json({ ok: false })
+    }
     return res.status(200).json({ ok: true, plan: cleaned })
   }
 
