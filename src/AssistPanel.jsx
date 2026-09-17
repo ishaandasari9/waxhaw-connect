@@ -8,7 +8,8 @@ import { findResources, needsUrgentPath } from './assist.js'
  * drawn by the same component the directory uses and this file never renders
  * resource details itself.
  */
-export default function AssistPanel({ renderResource }) {
+export default function AssistPanel({ renderResource, variant = 'inline', headingId = 'assist-heading' }) {
+  const inDrawer = variant === 'drawer'
   const [question, setQuestion] = useState('')
   const [state, setState] = useState({ status: 'idle', results: [], note: '', source: '' })
 
@@ -33,11 +34,11 @@ export default function AssistPanel({ renderResource }) {
   }
 
   return (
-    <section className="assist section" aria-labelledby="assist-heading">
+    <section className={inDrawer ? 'assist assist--drawer' : 'assist section'} aria-labelledby={headingId}>
       <div className="assist__intro">
-        <span className="feature-icon"><MessageCircle /></span>
+        {!inDrawer && <span className="feature-icon"><MessageCircle /></span>}
         <div>
-          <h2 id="assist-heading">Describe your situation</h2>
+          <h2 id={headingId}>Describe your situation</h2>
           <p>If you are not sure what to search for, say what is going on in your own words and we will point you to listings that may fit.</p>
         </div>
       </div>

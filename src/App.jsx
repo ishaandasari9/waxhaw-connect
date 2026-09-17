@@ -5,7 +5,7 @@ import {
   Building2, Bus, CalendarDays, Check, ChevronDown, CircleAlert, Clock3, Compass,
   ExternalLink, Eye, FileDown, Filter, Globe2, GraduationCap, HandHeart, HeartPulse,
   Home, House, Info, Languages, Leaf, LockKeyhole, LogIn, LogOut, Mail, MapPin, Menu,
-  Minus, Phone, Plus, Printer, Search, Send, Settings2, ShieldCheck, Sparkles, Trash2,
+  Minus, Moon, Phone, Plus, Printer, Search, Send, Settings2, ShieldCheck, Sparkles, Sun, Trash2,
   TreePine, UserRound, Users, Utensils, X, Zap,
 } from 'lucide-react'
 import { categories, events, resources, sourceNotes, urgentLinks } from './data'
@@ -15,7 +15,12 @@ import {
   createAccount, isBackendConfigured, loadProfile, publishCommunityEvent, removeCommunityEvent,
   saveProfile, signInWithEmail, signOutCurrentUser, subscribeToAuth, subscribeToCommunityEvents,
 } from './backend'
-import AssistPanel from './AssistPanel.jsx'
+import AssistLauncher from './AssistLauncher.jsx'
+import EventPlannerPage, { PLAN_DRAFT_KEY } from './EventPlanner.jsx'
+import PageHero from './PageHero.jsx'
+import { DirectionsLink, DistanceOptions, DistanceTag, LocationPicker } from './DistanceControls.jsx'
+import { DistanceContext, useDistanceState } from './distanceContext.js'
+import { arrangeByDistance, describeDistance, placeFor } from './distance.js'
 
 const AppContext = createContext(null)
 
@@ -31,6 +36,7 @@ const copy = {
     guide: 'Help me choose', guideSub: 'Not sure where to start? Answer a few quick questions and we’ll suggest resources.',
     verified: 'Verified source', checked: 'Information checked', viewDetails: 'View details', save: 'Save', savedVerb: 'Saved',
     upcoming: 'Upcoming in Waxhaw', viewAll: 'View all resources', openNow: 'Open now', closedNow: 'Closed now',
+    darkMode: 'Dark mode', lightMode: 'Light mode', switchDark: 'Switch to dark mode', switchLight: 'Switch to light mode', theme: 'Appearance', themeSystem: 'Device', themeLight: 'Light', themeDark: 'Dark',
   },
   es: {
     resources: 'Recursos', events: 'Eventos', finder: 'Guía personalizada', about: 'Acerca de', saved: 'Guardados',
@@ -43,6 +49,7 @@ const copy = {
     guide: 'Ayúdeme a elegir', guideSub: '¿No sabe por dónde empezar? Responda algunas preguntas y le sugeriremos recursos.',
     verified: 'Fuente verificada', checked: 'Información revisada', viewDetails: 'Ver detalles', save: 'Guardar', savedVerb: 'Guardado',
     upcoming: 'Próximamente en Waxhaw', viewAll: 'Ver todos los recursos', openNow: 'Abierto ahora', closedNow: 'Cerrado ahora',
+    darkMode: 'Modo oscuro', lightMode: 'Modo claro', switchDark: 'Cambiar a modo oscuro', switchLight: 'Cambiar a modo claro', theme: 'Apariencia', themeSystem: 'Dispositivo', themeLight: 'Claro', themeDark: 'Oscuro',
   },
 }
 
@@ -74,12 +81,32 @@ function useStoredState(key, initialValue) {
   return [value, setValue]
 }
 
+/* Browser chrome color for each theme, matching --fill-deep. */
+const THEME_COLORS = { light: '#173f35', dark: '#000b05' }
+
+/** Turns 'system' into what the device is actually showing, and follows changes. */
+function useResolvedTheme(theme) {
+  const query = '(prefers-color-scheme: dark)'
+  const [systemDark, setSystemDark] = useState(() => typeof window !== 'undefined' && window.matchMedia?.(query).matches)
+  useEffect(() => {
+    const media = window.matchMedia?.(query)
+    if (!media) return undefined
+    const onChange = (event) => setSystemDark(event.matches)
+    media.addEventListener('change', onChange)
+    return () => media.removeEventListener('change', onChange)
+  }, [])
+  if (theme === 'dark' || theme === 'light') return theme
+  return systemDark ? 'dark' : 'light'
+}
+
 function App() {
   const [saved, setSaved] = useStoredState('waxhaw-saved', [])
   const [language, setLanguage] = useStoredState('waxhaw-language', 'en')
   const [preferences, setPreferences] = useStoredState('waxhaw-accessibility', {
-    text: 'normal', contrast: false, reducedMotion: false,
+    text: 'normal', contrast: false, reducedMotion: false, theme: 'system',
   })
+  const theme = preferences.theme || 'system'
+  const resolvedTheme = useResolvedTheme(theme)
   const [compare, setCompare] = useState([])
   const [authUser, setAuthUser] = useState(null)
   const [profile, setProfile] = useState(null)
@@ -88,6 +115,7 @@ function App() {
   const [eventsNotice, setEventsNotice] = useState('')
   const [toast, setToast] = useState('')
   const [online, setOnline] = useState(navigator.onLine)
+  const distance = useDistanceState()
 
   useEffect(() => subscribeToAuth(
     (user) => { setAuthUser(user); setAuthStatus('ready') },
@@ -123,7 +151,12 @@ function App() {
     document.documentElement.dataset.text = preferences.text
     document.documentElement.dataset.contrast = preferences.contrast ? 'high' : 'normal'
     document.documentElement.dataset.motion = preferences.reducedMotion ? 'reduced' : 'full'
-  }, [language, preferences])
+    document.documentElement.dataset.theme = theme
+  }, [language, preferences, theme])
+
+  useEffect(() => {
+    document.querySelector('meta[name="theme-color"]')?.setAttribute('content', THEME_COLORS[resolvedTheme])
+  }, [resolvedTheme])
 
   useEffect(() => {
     const on = () => setOnline(true)
@@ -185,13 +218,14 @@ function App() {
   }
 
   const value = {
-    saved, toggleSaved, compare, toggleCompare, language, setLanguage, preferences, setPreferences,
+    saved, toggleSaved, compare, toggleCompare, language, setLanguage, preferences, setPreferences, theme, resolvedTheme,
     setToast, t: copy[language], currentUser, authStatus, eventsNotice, allEvents, register, login,
     signOut, updateProfile, addPostedEvent, removePostedEvent,
   }
 
   return (
     <AppContext.Provider value={value}>
+    <DistanceContext.Provider value={distance}>
       <a className="skip-link" href="#main-content">Skip to main content</a>
       {!online && <div className="offline-banner" role="status"><Zap size={17} /> You’re offline. Saved information and previously visited pages remain available.</div>}
       <Header />
@@ -203,6 +237,7 @@ function App() {
           <Route path="/resources/:resourceId" element={<ResourceDetailPage />} />
           <Route path="/finder" element={<FinderPage />} />
           <Route path="/events" element={<EventsPage />} />
+          <Route path="/events/plan" element={<EventPlannerPage />} />
           <Route path="/events/new" element={<PostEventPage />} />
           <Route path="/login" element={<LoginPage />} />
           <Route path="/account" element={<AccountPage />} />
@@ -213,8 +248,10 @@ function App() {
         </Routes>
       </main>
       <CompareTray />
+      <AssistLauncher renderResource={(resource) => <ResourceCard resource={resource} compact />} raised={compare.length > 0} />
       <Footer />
       <div className={`toast ${toast ? 'is-visible' : ''}`} role="status" aria-live="polite">{toast}</div>
+    </DistanceContext.Provider>
     </AppContext.Provider>
   )
 }
@@ -229,6 +266,7 @@ function ScrollToTop() {
       '/finder': pageTitle('Guided resource finder'),
       '/events': pageTitle('Community events'),
       '/events/new': pageTitle('Post a community event'),
+      '/events/plan': pageTitle('Event planner'),
       '/login': pageTitle('Sign in'),
       '/account': pageTitle('Your account'),
       '/saved': pageTitle('Your saved plan'),
@@ -251,8 +289,10 @@ function BrandMark({ compact = false }) {
 }
 
 function Header() {
-  const { saved, language, setLanguage, preferences, setPreferences, currentUser, t } = useContext(AppContext)
+  const { saved, language, setLanguage, preferences, setPreferences, theme, resolvedTheme, currentUser, t } = useContext(AppContext)
   const [menuOpen, setMenuOpen] = useState(false)
+  const isDark = resolvedTheme === 'dark'
+  const setTheme = (value) => setPreferences({ ...preferences, theme: value })
   const [accessOpen, setAccessOpen] = useState(false)
   const location = useLocation()
   useEffect(() => { setMenuOpen(false); setAccessOpen(false) }, [location.pathname])
@@ -268,6 +308,9 @@ function Header() {
         <div className="utility-actions">
           <button className="utility-button" onClick={() => setLanguage(language === 'en' ? 'es' : 'en')} aria-label={language === 'en' ? 'Cambiar a español' : 'Switch to English'}>
             <Languages size={16} /> {language === 'en' ? 'Español' : 'English'}
+          </button>
+          <button className="utility-button" onClick={() => setTheme(isDark ? 'light' : 'dark')} aria-label={isDark ? t.switchLight : t.switchDark}>
+            {isDark ? <Sun size={16} /> : <Moon size={16} />} {isDark ? t.lightMode : t.darkMode}
           </button>
           <button className="utility-button" onClick={() => setAccessOpen(!accessOpen)} aria-expanded={accessOpen} aria-controls="accessibility-panel">
             <Accessibility size={17} /> Accessibility
@@ -301,6 +344,14 @@ function Header() {
                 <button key={size} className={preferences.text === size ? 'is-active' : ''} onClick={() => setPreferences({ ...preferences, text: size })} aria-pressed={preferences.text === size}>
                   A{index ? '+' : ''}{index === 2 ? '+' : ''}
                 </button>
+              ))}
+            </div>
+          </fieldset>
+          <fieldset>
+            <legend>{t.theme}</legend>
+            <div className="segmented segmented--words">
+              {[['system', t.themeSystem], ['light', t.themeLight], ['dark', t.themeDark]].map(([value, label]) => (
+                <button key={value} className={theme === value ? 'is-active' : ''} onClick={() => setTheme(value)} aria-pressed={theme === value}>{label}</button>
               ))}
             </div>
           </fieldset>
@@ -469,7 +520,7 @@ function ResourceCard({ resource, compact = false }) {
     <article className={`resource-card ${compact ? 'resource-card--compact' : ''}`}>
       <div className="resource-card__top"><span className={`category-symbol category-symbol--${resource.category}`}><Icon /></span><div className="resource-card__badges"><SourceBadge />{open !== null && <span className={open ? 'open-badge' : 'closed-badge'}>{open ? t.openNow : t.closedNow}</span>}</div></div>
       <div><span className="resource-card__category">{categories.find((item) => item.id === resource.category)?.label}</span><h2><Link to={`/resources/${resource.id}`}>{resource.name}</Link></h2><p>{language === 'es' ? resource.descriptionEs : resource.description}</p></div>
-      <div className="resource-meta"><span><MapPin /> {resource.location}</span><span><Clock3 /> {resource.hours}</span><span><Info /> {resource.cost}</span></div>
+      <div className="resource-meta"><span><MapPin /> {resource.location}</span><DistanceTag item={resource} /><span><Clock3 /> {resource.hours}</span><span><Info /> {resource.cost}</span></div>
       <div className="tag-list">{resource.audiences.slice(0, 3).map((tag) => <span key={tag}>{tag}</span>)}</div>
       <div className="resource-card__actions">
         <Link className="text-link" to={`/resources/${resource.id}`}>{t.viewDetails}<ArrowRight size={16} /></Link>
@@ -487,7 +538,10 @@ function ResourcesPage() {
   const [audience, setAudience] = useState('all')
   const [cost, setCost] = useState('all')
   const [filtersOpen, setFiltersOpen] = useState(false)
+  const [nearestFirst, setNearestFirst] = useState(false)
+  const [within, setWithin] = useState(0)
   const { language } = useContext(AppContext)
+  const { origin } = useContext(DistanceContext)
 
   useEffect(() => { setQuery(params.get('q') || ''); setCategory(params.get('category') || 'all') }, [params])
 
@@ -502,14 +556,14 @@ function ResourcesPage() {
   }), [query, category, audience, cost])
 
   const submitSearch = (e) => { e.preventDefault(); const next = new URLSearchParams(); if (query) next.set('q', query); if (category !== 'all') next.set('category', category); setParams(next) }
-  const clear = () => { setQuery(''); setCategory('all'); setAudience('all'); setCost('all'); setParams({}) }
+  const clear = () => { setQuery(''); setCategory('all'); setAudience('all'); setCost('all'); setWithin(0); setParams({}) }
+  const shown = useMemo(() => arrangeByDistance(results, origin, { sort: nearestFirst, within }), [results, origin, nearestFirst, within])
 
   return (
     <>
       <PageHero eyebrow="Resource directory" title="Find the right support" intro="Search trusted organizations, programs and services serving Waxhaw and Union County." compact>
         <form className="directory-search" onSubmit={submitSearch} role="search"><label htmlFor="directory-query">What do you need?</label><div><Search /><input id="directory-query" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Try food, rides, child care or benefits" /><button className="button button--primary">Search</button></div></form>
       </PageHero>
-      <AssistPanel renderResource={(resource) => <ResourceCard resource={resource} compact />} />
       <section className="directory-layout section">
       <button className="filter-toggle" onClick={() => setFiltersOpen(!filtersOpen)} aria-expanded={filtersOpen}><Filter /> Filters <ChevronDown /></button>
       <aside className={`filters ${filtersOpen ? 'filters--open' : ''}`} aria-label="Resource filters">
@@ -520,8 +574,10 @@ function ResourcesPage() {
         <div className="filter-help"><Compass /><strong>Not sure which filters to use?</strong><p>Our guided finder asks plain-language questions.</p><Link to="/finder">Help me choose <ArrowRight /></Link></div>
       </aside>
       <div className="results">
-        <div className="results__heading"><div><span aria-live="polite">{results.length} resource{results.length === 1 ? '' : 's'} found</span>{query && <strong> for “{query}”</strong>}</div><span>Checked September 11, 2026</span></div>
-        {results.length ? <div className="resource-list">{results.map((resource) => <ResourceCard key={resource.id} resource={resource} />)}</div> : <div className="empty-state"><Search /><h2>We couldn’t find an exact match</h2><p>Try a broader word, remove a filter, or use the guided finder. You can also call NC 211 for personal help.</p><div><button className="button button--primary" onClick={clear}>Clear search and filters</button><Link className="button button--secondary" to="/finder">Use guided finder</Link></div></div>}
+        <div className="distance-bar"><LocationPicker /><DistanceOptions sort={nearestFirst} onSort={setNearestFirst} within={within} onWithin={setWithin} /></div>
+        {origin && within > 0 && <p className="distance-note">Countywide, statewide and phone-based services stay in the list because they serve you wherever you are.</p>}
+        <div className="results__heading"><div><span aria-live="polite">{shown.length} resource{shown.length === 1 ? '' : 's'} found</span>{query && <strong> for “{query}”</strong>}</div><span>Checked September 11, 2026</span></div>
+        {shown.length ? <div className="resource-list">{shown.map((resource) => <ResourceCard key={resource.id} resource={resource} />)}</div> : <div className="empty-state"><Search /><h2>We couldn’t find an exact match</h2><p>Try a broader word, remove a filter, or use the guided finder. You can also call NC 211 for personal help.</p><div><button className="button button--primary" onClick={clear}>Clear search and filters</button><Link className="button button--secondary" to="/finder">Use guided finder</Link></div></div>}
       </div>
       </section>
     </>
@@ -539,9 +595,9 @@ function ResourceDetailPage() {
   return (
     <>
       <section className="detail-hero">
-        <div className="section"><Link className="back-link" to="/resources"><ArrowLeft /> Back to all resources</Link><div className="detail-hero__grid"><div><div className="detail-kickers"><span className="category-symbol"><Icon /></span><SourceBadge />{open !== null && <span className={open ? 'open-badge' : 'closed-badge'}>{open ? t.openNow : t.closedNow}</span>}</div><h1>{resource.name}</h1><p>{language === 'es' ? resource.descriptionEs : resource.description}</p><div className="detail-actions"><a className="button button--primary" href={`tel:${resource.phone.replace(/[^\d]/g, '')}`}><Phone /> Call {resource.phone}</a><a className="button button--secondary" href={resource.sourceUrl} target="_blank" rel="noreferrer">Visit provider site <ExternalLink /></a><button className={saved.includes(resource.id) ? 'button button--saved' : 'button button--secondary'} onClick={() => toggleSaved(resource.id)}><Bookmark /> {saved.includes(resource.id) ? 'Saved to plan' : 'Save to plan'}</button></div></div><aside className="verification-card"><BadgeCheck /><strong>Information you can verify</strong><span>Source: {resource.source}</span><span>Checked: {resource.verified}</span><a href={resource.sourceUrl} target="_blank" rel="noreferrer">View original source <ExternalLink /></a></aside></div></div>
+        <div className="section"><Link className="back-link" to="/resources"><ArrowLeft /> Back to all resources</Link><div className="detail-hero__grid"><div><div className="detail-kickers"><span className="category-symbol"><Icon /></span><SourceBadge />{open !== null && <span className={open ? 'open-badge' : 'closed-badge'}>{open ? t.openNow : t.closedNow}</span>}</div><h1>{resource.name}</h1><p>{language === 'es' ? resource.descriptionEs : resource.description}</p><div className="detail-actions"><a className="button button--primary" href={`tel:${resource.phone.replace(/[^\d]/g, '')}`}><Phone /> Call {resource.phone}</a><DirectionsLink item={resource} /><a className="button button--secondary" href={resource.sourceUrl} target="_blank" rel="noreferrer">Visit provider site <ExternalLink /></a><button className={saved.includes(resource.id) ? 'button button--saved' : 'button button--secondary'} onClick={() => toggleSaved(resource.id)}><Bookmark /> {saved.includes(resource.id) ? 'Saved to plan' : 'Save to plan'}</button></div></div><aside className="verification-card"><BadgeCheck /><strong>Information you can verify</strong><span>Source: {resource.source}</span><span>Checked: {resource.verified}</span><a href={resource.sourceUrl} target="_blank" rel="noreferrer">View original source <ExternalLink /></a></aside></div></div>
       </section>
-      <section className="section detail-layout"><article><h2>How this resource can help</h2><p>{resource.details}</p><div className="detail-facts"><div><Clock3 /><span><strong>Hours</strong>{resource.hours}</span></div><div><MapPin /><span><strong>Location</strong>{resource.location}</span></div><div><Info /><span><strong>Cost</strong>{resource.cost}</span></div><div><Globe2 /><span><strong>Languages</strong>{resource.languages.join(', ')}</span></div></div><h2>Before you contact them</h2><ul className="check-list"><li><Check /> Call or check the provider website to confirm current eligibility, hours and documents needed.</li><li><Check /> Ask about language or disability accommodations when scheduling.</li><li><Check /> If this resource is not a match, call NC 211 for a personalized referral.</li></ul></article><aside className="next-step"><span className="eyebrow">Your next step</span><h2>Keep the details handy</h2><p>Print this page or save the resource to your personal action plan.</p><button className="button button--secondary" onClick={() => window.print()}><Printer /> Print this resource</button><Link to="/saved">Open saved plan <ArrowRight /></Link></aside></section>
+      <section className="section detail-layout"><article><h2>How this resource can help</h2><p>{resource.details}</p><div className="detail-facts"><div><Clock3 /><span><strong>Hours</strong>{resource.hours}</span></div><div><MapPin /><span><strong>Location</strong>{resource.location}<DistanceTag item={resource} /></span></div><div><Info /><span><strong>Cost</strong>{resource.cost}</span></div><div><Globe2 /><span><strong>Languages</strong>{resource.languages.join(', ')}</span></div></div><h2>Before you contact them</h2><ul className="check-list"><li><Check /> Call or check the provider website to confirm current eligibility, hours and documents needed.</li><li><Check /> Ask about language or disability accommodations when scheduling.</li><li><Check /> If this resource is not a match, call NC 211 for a personalized referral.</li></ul></article><aside className="next-step"><span className="eyebrow">Your next step</span><h2>Keep the details handy</h2><p>Print this page or save the resource to your personal action plan.</p><button className="button button--secondary" onClick={() => window.print()}><Printer /> Print this resource</button><Link to="/saved">Open saved plan <ArrowRight /></Link></aside></section>
       {!!related.length && <section className="section related"><div className="section-heading"><div><span className="eyebrow">More options</span><h2>Related resources</h2></div></div><div className="related-grid">{related.map((item) => <ResourceCard key={item.id} resource={item} compact />)}</div></section>}
     </>
   )
@@ -557,22 +613,25 @@ function FinderPage() {
     { key: 'priority', title: 'What matters most right now?', hint: 'We’ll prioritize resources using this preference.', options: [{ value: 'fast', label: 'Available as soon as possible', icon: Zap }, { value: 'free', label: 'Free or low-cost support', icon: HandHeart }, { value: 'local', label: 'Closest to Waxhaw', icon: MapPin }, { value: 'language', label: 'Language or access support', icon: Languages }] },
   ]
   const question = questions[step]
+  const { origin } = useContext(DistanceContext)
   const results = useMemo(() => {
     if (step < questions.length) return []
-    return resources.filter((item) => item.category === answers.need).sort((a, b) => {
+    const matching = resources.filter((item) => item.category === answers.need)
+    if (answers.priority === 'local' && origin) return arrangeByDistance(matching, origin, { sort: true }).slice(0, 4)
+    return matching.sort((a, b) => {
       if (answers.priority === 'free') return Number(b.cost.toLowerCase().includes('free')) - Number(a.cost.toLowerCase().includes('free'))
       if (answers.priority === 'fast') return Number(Boolean(b.alwaysOpen || b.schedule)) - Number(Boolean(a.alwaysOpen || a.schedule))
       if (answers.priority === 'local') return Number(b.location.toLowerCase().includes('waxhaw')) - Number(a.location.toLowerCase().includes('waxhaw'))
       return b.languages.length - a.languages.length
     }).slice(0, 4)
-  }, [step, answers])
+  }, [step, answers, origin])
   const choose = (value) => { setAnswers({ ...answers, [question.key]: value }); window.setTimeout(() => setStep(step + 1), 150) }
   const reset = () => { setStep(0); setAnswers({ need: '', who: '', priority: '' }) }
   return (
     <>
       <PageHero eyebrow="Guided resource finder" title={step < questions.length ? 'A few questions. A clearer next step.' : 'Here are some places to start.'} intro={step < questions.length ? 'No forms, no account, and no personal information is stored.' : 'These suggestions are based on your choices. Always confirm eligibility with the provider.'} compact />
       <section className="section finder-shell">
-        {step < questions.length ? <div className="finder-panel"><div className="finder-progress"><span>Question {step + 1} of {questions.length}</span><div role="progressbar" aria-label="Guided finder progress" aria-valuemin="1" aria-valuemax={questions.length} aria-valuenow={step + 1} aria-valuetext={`Question ${step + 1} of ${questions.length}`}><span style={{ width: `${((step + 1) / questions.length) * 100}%` }} /></div></div><h2>{question.title}</h2><p>{question.hint}</p><div className="finder-options">{question.options.map((option) => { const Icon = option.icon; return <button key={option.value} onClick={() => choose(option.value)}><Icon /><span>{option.label}</span><ArrowRight /></button> })}</div>{step > 0 && <button className="back-link" onClick={() => setStep(step - 1)}><ArrowLeft /> Previous question</button>}</div> : <div className="finder-results"><div className="finder-summary"><BadgeCheck /><div><strong>Your suggested starting points</strong><span>Need: {categories.find((item) => item.id === answers.need)?.label} · Priority: {answers.priority}</span></div><button onClick={reset}>Start over</button></div>{results.length ? <div className="related-grid">{results.map((item) => <ResourceCard key={item.id} resource={item} compact />)}</div> : <div className="empty-state"><Compass /><h2>Let’s broaden the search</h2><p>We do not have an exact listing in this category yet. NC 211 can connect you with a verified specialist.</p><Link className="button button--primary" to="/resources">Browse all resources</Link></div>}<div className="finder-actions"><button className="button button--secondary" onClick={() => window.print()}><Printer /> Print suggestions</button><button className="button button--primary" onClick={() => navigate(`/resources?category=${answers.need}`)}>See every matching resource <ArrowRight /></button></div></div>}
+        {step < questions.length ? <div className="finder-panel"><div className="finder-progress"><span>Question {step + 1} of {questions.length}</span><div role="progressbar" aria-label="Guided finder progress" aria-valuemin="1" aria-valuemax={questions.length} aria-valuenow={step + 1} aria-valuetext={`Question ${step + 1} of ${questions.length}`}><span style={{ width: `${((step + 1) / questions.length) * 100}%` }} /></div></div><h2>{question.title}</h2><p>{question.hint}</p><div className="finder-options">{question.options.map((option) => { const Icon = option.icon; return <button key={option.value} onClick={() => choose(option.value)}><Icon /><span>{option.label}</span><ArrowRight /></button> })}</div>{step > 0 && <button className="back-link" onClick={() => setStep(step - 1)}><ArrowLeft /> Previous question</button>}</div> : <div className="finder-results">{answers.priority === 'local' && <LocationPicker compact />}<div className="finder-summary"><BadgeCheck /><div><strong>Your suggested starting points</strong><span>Need: {categories.find((item) => item.id === answers.need)?.label} · Priority: {answers.priority}</span></div><button onClick={reset}>Start over</button></div>{results.length ? <div className="related-grid">{results.map((item) => <ResourceCard key={item.id} resource={item} compact />)}</div> : <div className="empty-state"><Compass /><h2>Let’s broaden the search</h2><p>We do not have an exact listing in this category yet. NC 211 can connect you with a verified specialist.</p><Link className="button button--primary" to="/resources">Browse all resources</Link></div>}<div className="finder-actions"><button className="button button--secondary" onClick={() => window.print()}><Printer /> Print suggestions</button><button className="button button--primary" onClick={() => navigate(`/resources?category=${answers.need}`)}>See every matching resource <ArrowRight /></button></div></div>}
         <aside className="privacy-note"><ShieldCheck /><div><strong>Private by design</strong><p>Your answers stay in this browser and are not sent anywhere.</p></div></aside>
       </section>
     </>
@@ -588,7 +647,10 @@ function EventsPage() {
     if (params.get('posted') === '1') setToast('Your event is now listed as a community submission.')
   }, [params, setToast])
   const rankedEvents = feed === 'For you' ? rankEventsForUser(allEvents, currentUser?.interests) : [...allEvents].sort((a, b) => a.date.localeCompare(b.date))
-  const filtered = filter === 'All' ? rankedEvents : rankedEvents.filter((event) => event.category === filter)
+  const { origin } = useContext(DistanceContext)
+  const [nearestFirst, setNearestFirst] = useState(false)
+  const categoryFiltered = filter === 'All' ? rankedEvents : rankedEvents.filter((event) => event.category === filter)
+  const filtered = arrangeByDistance(categoryFiltered, origin, { sort: nearestFirst })
   const downloadCalendar = (eventItem) => {
     const date = eventItem.date.replaceAll('-', '')
     const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART;VALUE=DATE:${date}\nSUMMARY:${eventItem.title}\nLOCATION:${eventItem.location}\nDESCRIPTION:${eventItem.description}\nEND:VEVENT\nEND:VCALENDAR`
@@ -601,7 +663,7 @@ function EventsPage() {
   return (
     <>
       <PageHero eyebrow="Community calendar" title="Show up for what matters" intro="Official listings and neighbor-posted events that bring Waxhaw together." compact>
-        <div className="hero-actions"><Link className="button button--primary" to="/events/new"><Plus /> Post an event</Link>{!currentUser && <Link className="button button--secondary" to="/login?returnTo=/events">Sign in for recommendations</Link>}</div>
+        <div className="hero-actions"><Link className="button button--primary" to="/events/new"><Plus /> Post an event</Link><Link className="button button--secondary" to="/events/plan"><Sparkles /> Plan an event</Link>{!currentUser && <Link className="button button--secondary" to="/login?returnTo=/events">Sign in for recommendations</Link>}</div>
       </PageHero>
       <section className="section events-page">
         {currentUser ? (
@@ -615,6 +677,7 @@ function EventsPage() {
             <span className="recommendation-icon"><Sparkles /></span><div><span className="eyebrow">Make it yours</span><h2 id="recommendation-title">Find more events you’ll love</h2><p>Choose your interests and we’ll bring the best matches to the top.</p></div><Link className="button button--secondary" to="/login?returnTo=/events">Create a profile</Link>
           </section>
         )}
+        <div className="distance-bar distance-bar--events"><LocationPicker compact /><DistanceOptions sort={nearestFirst} onSort={setNearestFirst} showWithin={false} defaultLabel={feed === 'For you' ? 'Best match' : 'Soonest first'} /></div>
         <div className="event-controls">
           {currentUser?.personalized && currentUser?.interests?.length > 0 && <div className="feed-tabs" aria-label="Choose event feed">{['For you', 'All events'].map((item) => <button key={item} className={feed === item ? 'is-active' : ''} onClick={() => setFeed(item)} aria-pressed={feed === item}>{item}</button>)}</div>}
           <div className="filter-pills" aria-label="Filter events">{['All', ...new Set(allEvents.map((event) => event.category))].map((item) => <button key={item} className={filter === item ? 'is-active' : ''} onClick={() => setFilter(item)} aria-pressed={filter === item}>{item}</button>)}</div>
@@ -622,7 +685,7 @@ function EventsPage() {
         <div className="event-list">{filtered.map((event) => {
           const date = new Date(`${event.date}T12:00:00`)
           const reason = feed === 'For you' ? getRecommendationReason(event, currentUser?.interests) : ''
-          return <article key={event.id} className="event-card"><time dateTime={event.date}><strong>{date.toLocaleDateString('en-US', { month: 'short' })}</strong><span>{date.getDate()}</span><small>{date.toLocaleDateString('en-US', { weekday: 'short' })}</small></time><div><div className="event-labels"><span className="event-category">{event.category}</span>{event.communitySubmitted && <span className="community-badge"><Users /> Community submitted</span>}{reason && <span className="match-reason"><Sparkles /> {reason}</span>}</div><h2>{event.title}</h2><p>{event.description}</p><div className="event-facts"><span><Clock3 /> {event.time}</span><span><MapPin /> {event.location}</span><span><Accessibility /> {event.accessibility}</span></div>{event.communitySubmitted && <small className="submitted-by">Posted by {event.organizer}. Confirm details with the organizer before attending.</small>}</div><div className="event-actions"><button className="button button--secondary" onClick={() => downloadCalendar(event)}><CalendarDays /> Add to calendar</button>{event.sourceUrl && <a className="text-link" href={event.sourceUrl} target="_blank" rel="noreferrer">{event.communitySubmitted ? 'Event link' : 'Official event details'} <ExternalLink /></a>}{currentUser && event.communitySubmitted && event.organizerId === currentUser.id && <button className="text-button text-button--danger" onClick={() => removePostedEvent(event.id)}><Trash2 /> Remove my event</button>}</div></article>
+          return <article key={event.id} className="event-card"><time dateTime={event.date}><strong>{date.toLocaleDateString('en-US', { month: 'short' })}</strong><span>{date.getDate()}</span><small>{date.toLocaleDateString('en-US', { weekday: 'short' })}</small></time><div><div className="event-labels"><span className="event-category">{event.category}</span>{event.communitySubmitted && <span className="community-badge"><Users /> Community submitted</span>}{reason && <span className="match-reason"><Sparkles /> {reason}</span>}</div><h2>{event.title}</h2><p>{event.description}</p><div className="event-facts"><span><Clock3 /> {event.time}</span><span><MapPin /> {event.location}</span><DistanceTag item={event} /><span><Accessibility /> {event.accessibility}</span></div>{event.communitySubmitted && <small className="submitted-by">Posted by {event.organizer}. Confirm details with the organizer before attending.</small>}</div><div className="event-actions"><button className="button button--secondary" onClick={() => downloadCalendar(event)}><CalendarDays /> Add to calendar</button><DirectionsLink item={event} className="text-link" />{event.sourceUrl && <a className="text-link" href={event.sourceUrl} target="_blank" rel="noreferrer">{event.communitySubmitted ? 'Event link' : 'Official event details'} <ExternalLink /></a>}{currentUser && event.communitySubmitted && event.organizerId === currentUser.id && <button className="text-button text-button--danger" onClick={() => removePostedEvent(event.id)}><Trash2 /> Remove my event</button>}</div></article>
         })}</div>
         {!filtered.length && <div className="empty-state"><CalendarDays /><h2>No events match this view</h2><p>Try another category or switch back to all events.</p></div>}
         {eventsNotice && <p className="freshness-note" role="status"><CircleAlert /> {eventsNotice}</p>}
@@ -696,11 +759,21 @@ function SignInRequired({ title, intro, returnTo }) {
 function PostEventPage() {
   const { currentUser, addPostedEvent } = useContext(AppContext)
   const navigate = useNavigate()
+  const statePrefill = useLocation().state?.prefill
+  const [prefill] = useState(() => {
+    if (statePrefill) return statePrefill
+    try { return JSON.parse(sessionStorage.getItem(PLAN_DRAFT_KEY) || 'null') } catch { return null }
+  })
   const today = new Date().toISOString().slice(0, 10)
-  const [form, setForm] = useState({ title: '', date: '', startTime: '', endTime: '', location: '', category: 'Family', description: '', accessibility: '', sourceUrl: '' })
+  const [form, setForm] = useState({ title: prefill?.title || '', date: '', startTime: '', endTime: '', location: '', category: eventInterests.includes(prefill?.category) ? prefill.category : 'Family', description: prefill?.description || '', accessibility: '', sourceUrl: '' })
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  /* Once a signed-in resident has the draft in the form, it has done its job. */
+  useEffect(() => {
+    if (currentUser) { try { sessionStorage.removeItem(PLAN_DRAFT_KEY) } catch { /* storage can be unavailable */ } }
+  }, [currentUser?.id])
   if (!currentUser) return <SignInRequired title="Sign in to post an event" intro="An account helps neighbors know who shared the listing and lets you manage it later." returnTo="/events/new" />
+  const fromPlan = Boolean(prefill?.title || prefill?.description)
   const update = (field) => (event) => setForm({ ...form, [field]: event.target.value })
   const submit = async (event) => {
     event.preventDefault()
@@ -712,7 +785,7 @@ function PostEventPage() {
     if (!result.ok) return setError(result.error)
     navigate('/events?posted=1')
   }
-  return <><PageHero eyebrow="Community submission" title="Post an event" intro="Share a gathering, class, meeting or activity with Waxhaw neighbors." compact /><section className="section post-event-layout"><form className="event-form" onSubmit={submit}><div className="form-section"><span>01</span><div><h2>Event basics</h2><p>Use a clear title and choose the closest category.</p><label>Event title<input required maxLength="80" value={form.title} onChange={update('title')} placeholder="Neighborhood garden workshop" /></label><label>Category<select value={form.category} onChange={update('category')}>{eventInterests.map((interest) => <option key={interest}>{interest}</option>)}</select></label><label>Description<textarea required maxLength="400" rows="5" value={form.description} onChange={update('description')} placeholder="What will happen, who is it for, and what should people bring?" /><small>{form.description.length}/400</small></label></div></div><div className="form-section"><span>02</span><div><h2>When and where</h2><div className="form-row"><label>Date<input required min={today} type="date" value={form.date} onChange={update('date')} /></label><label>Starts<input required type="time" value={form.startTime} onChange={update('startTime')} /></label><label>Ends (optional)<input type="time" value={form.endTime} min={form.startTime} onChange={update('endTime')} /></label></div><label>Location<input required maxLength="120" value={form.location} onChange={update('location')} placeholder="Venue name and street address" /></label></div></div><div className="form-section"><span>03</span><div><h2>Help neighbors plan</h2><label>Accessibility details<textarea rows="3" maxLength="220" value={form.accessibility} onChange={update('accessibility')} placeholder="Accessible entrance, parking, seating, interpreters, or who to contact" /></label><label>Event website (optional)<input type="url" value={form.sourceUrl} onChange={update('sourceUrl')} placeholder="https://example.org/event" /></label></div></div><div className="submission-check"><ShieldCheck /><div><strong>Community-submitted listing</strong><p>Your event will be labeled with your profile name and kept separate from verified official listings. You can remove it from the calendar at any time.</p></div></div>{error && <p className="form-error" role="alert"><CircleAlert /> {error}</p>}<div className="form-actions form-actions--end"><Link className="button button--secondary" to="/events">Cancel</Link><button className="button button--primary" disabled={busy}><Send /> {busy ? 'Publishing…' : 'Publish event'}</button></div></form><aside className="posting-guide"><h2>Before you post</h2><ol><li><span>1</span><p><strong>Check the details.</strong> Dates and locations are the organizer’s responsibility.</p></li><li><span>2</span><p><strong>Make it inclusive.</strong> Describe accessibility, cost and who the event welcomes.</p></li><li><span>3</span><p><strong>Keep it local.</strong> Events should serve Waxhaw or nearby Union County residents.</p></li></ol><p className="local-data-note"><Info /> Published events appear on the community calendar for every visitor. You can remove yours at any time.</p></aside></section></>
+  return <><PageHero eyebrow="Community submission" title="Post an event" intro="Share a gathering, class, meeting or activity with Waxhaw neighbors." compact /><section className="section post-event-layout"><form className="event-form" onSubmit={submit}>{fromPlan && <p className="prefill-note" role="status"><Sparkles /> Started from your event plan. Review the wording, then add the date, time and place.</p>}<div className="form-section"><span>01</span><div><h2>Event basics</h2><p>Use a clear title and choose the closest category.</p><label>Event title<input required maxLength="80" value={form.title} onChange={update('title')} placeholder="Neighborhood garden workshop" /></label><label>Category<select value={form.category} onChange={update('category')}>{eventInterests.map((interest) => <option key={interest}>{interest}</option>)}</select></label><label>Description<textarea required maxLength="400" rows="5" value={form.description} onChange={update('description')} placeholder="What will happen, who is it for, and what should people bring?" /><small>{form.description.length}/400</small></label></div></div><div className="form-section"><span>02</span><div><h2>When and where</h2><div className="form-row"><label>Date<input required min={today} type="date" value={form.date} onChange={update('date')} /></label><label>Starts<input required type="time" value={form.startTime} onChange={update('startTime')} /></label><label>Ends (optional)<input type="time" value={form.endTime} min={form.startTime} onChange={update('endTime')} /></label></div><label>Location<input required maxLength="120" value={form.location} onChange={update('location')} placeholder="Venue name and street address" /></label></div></div><div className="form-section"><span>03</span><div><h2>Help neighbors plan</h2><label>Accessibility details<textarea rows="3" maxLength="220" value={form.accessibility} onChange={update('accessibility')} placeholder="Accessible entrance, parking, seating, interpreters, or who to contact" /></label><label>Event website (optional)<input type="url" value={form.sourceUrl} onChange={update('sourceUrl')} placeholder="https://example.org/event" /></label></div></div><div className="submission-check"><ShieldCheck /><div><strong>Community-submitted listing</strong><p>Your event will be labeled with your profile name and kept separate from verified official listings. You can remove it from the calendar at any time.</p></div></div>{error && <p className="form-error" role="alert"><CircleAlert /> {error}</p>}<div className="form-actions form-actions--end"><Link className="button button--secondary" to="/events">Cancel</Link><button className="button button--primary" disabled={busy}><Send /> {busy ? 'Publishing…' : 'Publish event'}</button></div></form><aside className="posting-guide"><h2>Before you post</h2><ol><li><span>1</span><p><strong>Check the details.</strong> Dates and locations are the organizer’s responsibility.</p></li><li><span>2</span><p><strong>Make it inclusive.</strong> Describe accessibility, cost and who the event welcomes.</p></li><li><span>3</span><p><strong>Keep it local.</strong> Events should serve Waxhaw or nearby Union County residents.</p></li></ol><p className="local-data-note"><Info /> Published events appear on the community calendar for every visitor. You can remove yours at any time.</p></aside></section></>
 }
 
 function SavedPage() {
@@ -722,7 +795,7 @@ function SavedPage() {
     <>
       <PageHero eyebrow="Your saved plan" title="Keep your next steps together" intro="Saved resources stay on this device. Print the plan or return whenever you are ready." compact />
       <section className="section saved-page">
-        {savedResources.length ? <><div className="plan-toolbar"><span><Bookmark /> {savedResources.length} saved resource{savedResources.length === 1 ? '' : 's'}</span><button className="button button--secondary" onClick={() => window.print()}><Printer /> Print action plan</button></div><ol className="action-plan">{savedResources.map((resource, index) => <li key={resource.id}><span className="action-plan__number">{String(index + 1).padStart(2, '0')}</span><div><h2><Link to={`/resources/${resource.id}`}>{resource.name}</Link></h2><p>{resource.description}</p><div className="resource-meta"><span><Phone /> {resource.phone}</span><span><Clock3 /> {resource.hours}</span></div></div><div className="action-plan__actions"><a className="button button--primary" href={`tel:${resource.phone.replace(/[^\d]/g, '')}`}>Call</a><button className="text-button" onClick={() => toggleSaved(resource.id)}>Remove</button></div></li>)}</ol></> : <div className="empty-state empty-state--large"><Bookmark /><h2>Your plan is ready when you are</h2><p>Save useful resources as you browse. They will appear here as a clear, printable next-step list.</p><div><Link className="button button--primary" to="/resources">Explore resources</Link><Link className="button button--secondary" to="/finder">Use guided finder</Link></div></div>}
+        {savedResources.length ? <><div className="plan-toolbar"><span><Bookmark /> {savedResources.length} saved resource{savedResources.length === 1 ? '' : 's'}</span><button className="button button--secondary" onClick={() => window.print()}><Printer /> Print action plan</button></div><ol className="action-plan">{savedResources.map((resource, index) => <li key={resource.id}><span className="action-plan__number">{String(index + 1).padStart(2, '0')}</span><div><h2><Link to={`/resources/${resource.id}`}>{resource.name}</Link></h2><p>{resource.description}</p><div className="resource-meta"><span><Phone /> {resource.phone}</span><span><Clock3 /> {resource.hours}</span><DistanceTag item={resource} /></div></div><div className="action-plan__actions"><a className="button button--primary" href={`tel:${resource.phone.replace(/[^\d]/g, '')}`}>Call</a><DirectionsLink item={resource} className="text-button" /><button className="text-button" onClick={() => toggleSaved(resource.id)}>Remove</button></div></li>)}</ol></> : <div className="empty-state empty-state--large"><Bookmark /><h2>Your plan is ready when you are</h2><p>Save useful resources as you browse. They will appear here as a clear, printable next-step list.</p><div><Link className="button button--primary" to="/resources">Explore resources</Link><Link className="button button--secondary" to="/finder">Use guided finder</Link></div></div>}
       </section>
     </>
   )
@@ -747,6 +820,7 @@ function AboutPage() {
 }
 
 function CompareTray() {
+  const { origin } = useContext(DistanceContext)
   const { compare, toggleCompare } = useContext(AppContext)
   const [expanded, setExpanded] = useState(false)
   if (!compare.length) return null
@@ -754,14 +828,11 @@ function CompareTray() {
   return (
     <aside className={`compare-tray ${expanded ? 'compare-tray--expanded' : ''}`} aria-label="Compare resources">
       <div className="compare-tray__bar"><button onClick={() => setExpanded(!expanded)} aria-expanded={expanded}><span><Filter /> Compare resources</span><strong>{items.length} of 3 selected</strong><ChevronDown /></button></div>
-      {expanded && <div className="compare-table"><div className="compare-table__intro"><h2>Compare your options</h2><p>Review practical details side by side.</p></div>{items.map((item) => <article key={item.id}><button className="icon-button" onClick={() => toggleCompare(item.id)} aria-label={`Remove ${item.name} from comparison`}><X /></button><h3>{item.name}</h3><dl><dt>Cost</dt><dd>{item.cost}</dd><dt>Hours</dt><dd>{item.hours}</dd><dt>Who it serves</dt><dd>{item.audiences.join(', ')}</dd><dt>Location</dt><dd>{item.location}</dd></dl><Link className="text-link" to={`/resources/${item.id}`}>View details <ArrowRight /></Link></article>)}</div>}
+      {expanded && <div className="compare-table"><div className="compare-table__intro"><h2>Compare your options</h2><p>Review practical details side by side.</p></div>{items.map((item) => <article key={item.id}><button className="icon-button" onClick={() => toggleCompare(item.id)} aria-label={`Remove ${item.name} from comparison`}><X /></button><h3>{item.name}</h3><dl><dt>Cost</dt><dd>{item.cost}</dd><dt>Hours</dt><dd>{item.hours}</dd><dt>Who it serves</dt><dd>{item.audiences.join(', ')}</dd><dt>Location</dt><dd>{item.location}</dd>{origin && <><dt>Distance</dt><dd>{describeDistance(origin, placeFor(item))?.text || 'No fixed location'}</dd></>}</dl><Link className="text-link" to={`/resources/${item.id}`}>View details <ArrowRight /></Link></article>)}</div>}
     </aside>
   )
 }
 
-function PageHero({ eyebrow, title, intro, children, compact = false, danger = false }) {
-  return <section className={`page-hero ${compact ? 'page-hero--compact' : ''} ${danger ? 'page-hero--danger' : ''}`}><div className="section"><span className="eyebrow">{eyebrow}</span><h1>{title}</h1><p>{intro}</p>{children}</div></section>
-}
 
 function NotFoundPage() {
   return <section className="section not-found"><Compass /><span className="eyebrow">404</span><h1>This path doesn’t lead to a resource</h1><p>The page may have moved. Start from the directory or let the guided finder point you in the right direction.</p><div><Link className="button button--primary" to="/resources">Browse resources</Link><Link className="button button--secondary" to="/finder">Use guided finder</Link></div></section>

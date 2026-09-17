@@ -247,6 +247,7 @@ export const resources = [
     languages: ['English', 'Call for language support'],
     accessibility: ['Confidential shelter', 'Crisis advocacy'],
     location: 'Confidential location, Union County',
+    confidentialLocation: true,
     source: 'Turning Point',
     sourceUrl: 'https://turningpointnc.org/',
     verified: 'September 11, 2026',
@@ -364,6 +365,7 @@ export const events = [
     category: 'Music',
     description: 'A free outdoor concert under the Water Tank featuring Darren Deese.',
     sourceUrl: 'https://www.waxhaw.com/our-town/events/jammin-by-the-tracks',
+    address: '115 McDonald Street, Waxhaw, NC 28173',
     accessibility: 'Outdoor venue; contact organizers for accommodations.',
   },
   {
@@ -375,6 +377,7 @@ export const events = [
     category: 'Civic',
     description: 'A scheduled public meeting of the Union County Library Board of Trustees.',
     sourceUrl: 'https://www.unioncountync.gov/government/boards-committees/board-of-county-commissioners/commissioner-appointments-to-boards-committees',
+    address: '1515 Cuthbertson Road, Waxhaw, NC 28173',
     accessibility: 'Accessible public building.',
   },
   {
@@ -386,6 +389,7 @@ export const events = [
     category: 'Festival',
     description: 'Waxhaw’s annual festival with local makers, music, food and a family area. Admission is free.',
     sourceUrl: 'https://www.waxhaw.com/our-town/events/autumn-treasures',
+    address: 'Downtown Waxhaw, NC 28173',
     accessibility: 'ADA parking is listed by the Town of Waxhaw.',
   },
   {
@@ -397,6 +401,7 @@ export const events = [
     category: 'Family',
     description: 'A community holiday parade hosted by the Town of Waxhaw.',
     sourceUrl: 'https://www.waxhaw.com/our-town/events/volunteering-at-events',
+    address: 'Downtown Waxhaw, NC 28173',
     accessibility: 'Check the official event page for route and access updates.',
   },
 ]
@@ -416,5 +421,7 @@ export const sourceNotes = [
   { name: 'Union County Public Schools', url: 'https://www.ucps.k12.nc.us/', role: 'Student and family support information' },
   { name: 'Turning Point', url: 'https://turningpointnc.org/', role: 'Union County crisis services for survivors' },
   { name: 'Common Heart', url: 'https://commonheart.org/', role: 'Food pantry and economic empowerment programs' },
+  { name: 'U.S. Census Bureau Geocoder', url: 'https://geocoding.geo.census.gov/geocoder/', role: 'Map coordinates for listed street addresses (public domain)' },
+  { name: 'GeoNames', url: 'https://www.geonames.org/', role: 'Approximate ZIP code center points for distances (CC BY 4.0)' },
   { name: "Waxhaw's Ray of Hope", url: 'https://waxhawsrayofhope.wixsite.com/waxhaws-ray-of-hope', role: 'Local food pantry information' },
 ]

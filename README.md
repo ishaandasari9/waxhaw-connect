@@ -87,14 +87,28 @@ Firebase web API keys are public by design and appear in the client bundle. Acce
 - Side-by-side comparison for up to three resources
 - English and Spanish discovery content
 - Text-size, high-contrast and reduced-motion controls
+- Distances by ZIP code or device location on resources, events, the compare tray, the saved plan and the guided finder, with nearest-first sorting, a radius filter and directions links. ZIP centers are bundled (GeoNames, CC BY 4.0) so nothing a resident types leaves the browser, device coordinates are rounded and never stored, and confidential shelter locations never get a point, a distance or a directions link
+- Light and dark themes that follow the device by default, with a one-click toggle, a pre-paint script to avoid a white flash, and printouts that always stay light. Both themes pass automated WCAG 2.2 AA contrast checks, including with high contrast turned on
 - Live open/closed indicators when reliable hours are available
 - Event filtering and downloadable calendar files
 - Resident accounts backed by Firebase Authentication, with editable event interests that follow the account across devices
 - Explainable event recommendations based only on interests residents choose
 - Community event posting that publishes to a shared calendar every visitor sees, with clear source labels and author-only removal
+- A floating community helper on every page that matches plain-language situations to verified listings
+- An AI event planner that uses live Google Search grounding to find similar events in other towns, explains why they worked, and turns that into a step-by-step plan that can prefill a calendar listing. Links come only from search grounding metadata, never from model-written text, and examples are hidden when a reply is not grounded
 - Source-verification dates and direct original-source links
 - Urgent-help pathway separated from everyday services
 - Offline app-shell caching for unreliable conference internet
+
+## Updating distances
+
+Street addresses get exact coordinates from the U.S. Census Bureau Geocoder (public domain, no key). After adding or changing an address in `src/data.js`, run:
+
+```
+npm run geocode
+```
+
+This rewrites `src/places.js`. Any address the Census cannot match is listed and falls back to an approximate ZIP-based distance. `python3 scripts/build-zip-centroids.py` rebuilds the bundled ZIP table (requires `pip install zipcodes`).
 
 ## Design rationale
 

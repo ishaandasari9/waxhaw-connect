@@ -102,3 +102,24 @@ export async function extractEventFields(pastedText) {
     return null
   }
 }
+
+/**
+ * Resolves to { ok: true, plan } or { ok: false, reason }. `reason` lets the
+ * page tell a rate limit apart from a connection problem.
+ */
+export async function planEvent(input) {
+  if (typeof navigator !== 'undefined' && navigator.onLine === false) return { ok: false, reason: 'offline' }
+  try {
+    const response = await fetch('/api/assist', {
+      method: 'POST',
+      headers: { 'content-type': 'application/json' },
+      body: JSON.stringify({ mode: 'plan', input }),
+    })
+    if (response.status === 429) return { ok: false, reason: 'limit' }
+    if (!response.ok) return { ok: false, reason: 'error' }
+    const payload = await response.json()
+    return payload.ok && payload.plan ? { ok: true, plan: payload.plan } : { ok: false, reason: 'error' }
+  } catch (error) {
+    return { ok: false, reason: 'offline' }
+  }
+}

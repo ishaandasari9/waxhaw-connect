@@ -7,7 +7,8 @@
     "dev": "vite --host 0.0.0.0",
     "build": "vite build",
     "preview": "vite preview --host 0.0.0.0",
-    "test": "vitest run"
+    "test": "vitest run",
+    "geocode": "node scripts/geocode-places.mjs"
   },
   "dependencies": {
     "@vitejs/plugin-react": "latest",
