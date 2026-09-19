@@ -9,7 +9,7 @@ import AssistPanel from './AssistPanel.jsx'
  * of that being hand-rolled. The panel stays mounted, so a resident who closes
  * the drawer to read a listing finds their question and results still there.
  */
-export default function AssistLauncher({ renderResource, raised = false }) {
+export default function AssistLauncher({ copy, renderResource, raised = false }) {
   const dialogRef = useRef(null)
   const [open, setOpen] = useState(false)
   const { pathname } = useLocation()
@@ -48,7 +48,7 @@ export default function AssistLauncher({ renderResource, raised = false }) {
         aria-expanded={open}
       >
         <MessageCircle aria-hidden="true" />
-        <span>Need help?</span>
+        <span>{copy.needHelp}</span>
       </button>
 
       <dialog
@@ -60,20 +60,20 @@ export default function AssistLauncher({ renderResource, raised = false }) {
       >
         <div className="assist-drawer__inner">
           <div className="assist-drawer__top">
-            <span>Community helper</span>
-            <button type="button" className="icon-button" onClick={hide} aria-label="Close helper">
+            <span>{copy.communityHelper}</span>
+            <button type="button" className="icon-button" onClick={hide} aria-label={copy.closeHelper}>
               <X />
             </button>
           </div>
 
-          <AssistPanel renderResource={renderResource} variant="drawer" headingId="assist-drawer-heading" />
+          <AssistPanel copy={copy.panel} renderResource={renderResource} variant="drawer" headingId="assist-drawer-heading" />
 
           <div className="assist-drawer__plan">
             <CalendarPlus aria-hidden="true" />
             <div>
-              <strong>Planning a community event?</strong>
-              <p>See what made similar events work in other towns, then get a step-by-step plan for Waxhaw.</p>
-              <Link className="text-link" to="/events/plan">Open the event planner</Link>
+              <strong>{copy.planningTitle}</strong>
+              <p>{copy.planningIntro}</p>
+              <Link className="text-link" to="/events/plan">{copy.openPlanner}</Link>
             </div>
           </div>
         </div>

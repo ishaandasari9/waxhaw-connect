@@ -5,8 +5,20 @@ import { DistanceContext } from './distanceContext.js'
 
 const DEFAULT_LABELS = {
   directions: 'Get directions', newTab: ' (opens in a new tab)', distanceExact: 'Straight-line distance from your location', distanceZip: 'Approximate straight-line distance based on ZIP code',
-  error1: 'Location access is off for this site. Enter a ZIP code instead.', error2: 'Your device could not find its location. Enter a ZIP code instead.', error3: 'Finding your location took too long. Try again or enter a ZIP code.', unavailable: 'Location is not available on this device. Enter a ZIP code instead.',
-  distancesFrom: 'Distances from', currentLocation: 'your current location', change: 'Change', stop: 'Stop showing distances', howFar: 'How far away is it?', zip: 'ZIP code', show: 'Show distances', or: 'or', locating: 'Locating', useLocation: 'Use my location', cancel: 'Cancel', hint: 'Your location stays in this browser. Distances are straight-line, not driving.', sort: 'Sort', nearest: 'Nearest first', within: 'Within', anyDistance: 'Any distance', miles: 'miles',
+  error1: 'Location access is off for this site. Enter a ZIP code instead.', error2: 'Your device could not find its location. Enter a ZIP code instead.', error3: 'Finding your location took too long. Try again or enter a ZIP code.', unavailable: 'Location is not available on this device. Enter a ZIP code instead.', invalidZip: 'Enter a 5-digit ZIP code, like 28173.', unsupportedZip: 'Distances are available for ZIP codes within about 45 miles of Waxhaw.',
+  distancesFrom: 'Distances from', currentLocation: 'your current location', change: 'Change', stop: 'Stop showing distances', howFar: 'How far away is it?', zip: 'ZIP code', show: 'Show distances', or: 'or', locating: 'Locating', useLocation: 'Use my location', cancel: 'Cancel', hint: 'Your location stays in this browser. Distances are straight-line, not driving.', sort: 'Sort', nearest: 'Nearest first', within: 'Within', anyDistance: 'Any distance', mile: 'mile', miles: 'miles', inZip: 'In your ZIP code', under: 'Under 0.1 mi', underSpoken: 'Under 0.1 miles away', exactSpoken: '{miles} miles away', about: 'About {miles} mi', aboutSpoken: 'About {miles} {unit} away',
+}
+
+function localizeDistance(distance, labels) {
+  if (distance.text === 'In your ZIP code') return { text: labels.inZip, spoken: labels.inZip }
+  if (distance.text.startsWith('Under')) return { text: labels.under, spoken: labels.underSpoken }
+  const miles = distance.text.match(/[\d.]+/)?.[0] || ''
+  if (distance.exact) return { text: `${miles} mi`, spoken: labels.exactSpoken.replace('{miles}', miles) }
+  const unit = Number(miles) === 1 ? labels.mile : labels.miles
+  return {
+    text: labels.about.replace('{miles}', miles),
+    spoken: labels.aboutSpoken.replace('{miles}', miles).replace('{unit}', unit),
+  }
 }
 
 /**
@@ -24,7 +36,7 @@ export function LocationPicker({ compact = false, labels = DEFAULT_LABELS }) {
   const submit = (event) => {
     event.preventDefault()
     const result = setZip(value)
-    if (!result.ok) return setError(result.error)
+    if (!result.ok) return setError(result.error.startsWith('Enter a 5-digit') ? labels.invalidZip : labels.unsupportedZip)
     setError('')
     setEditing(false)
     setValue('')
@@ -83,14 +95,15 @@ export function DistanceTag({ item, labels = DEFAULT_LABELS }) {
   const { origin } = useContext(DistanceContext)
   const distance = describeDistance(origin, placeFor(item))
   if (!distance) return null
+  const localized = localizeDistance(distance, labels)
   const title = distance.exact
     ? labels.distanceExact
     : labels.distanceZip
   return (
     <span className="distance-tag" title={title}>
       <Navigation aria-hidden="true" />
-      <span aria-hidden="true">{distance.text}</span>
-      <span className="visually-hidden">{distance.spoken}</span>
+      <span aria-hidden="true">{localized.text}</span>
+      <span className="visually-hidden">{localized.spoken}</span>
     </span>
   )
 }
