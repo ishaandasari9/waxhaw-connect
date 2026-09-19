@@ -22,7 +22,8 @@ describe('directory metrics', () => {
   })
 
   it('marks a target as missed when the calendar is thin', () => {
-    const upcoming = rowFor(rows, 'Upcoming events')
+    const thinCalendar = Array.from({ length: 7 }, (_, index) => ({ id: index, date: '2026-12-01' }))
+    const upcoming = rowFor(directoryMetrics(resources, thinCalendar, now), 'Upcoming events')
     expect(upcoming.met).toBe(false)
     expect(rowFor(directoryMetrics(resources, Array.from({ length: 9 }, (_, index) => ({ id: index, date: '2026-12-01' })), now), 'Upcoming events').met).toBe(true)
   })

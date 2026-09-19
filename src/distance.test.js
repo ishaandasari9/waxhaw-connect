@@ -26,8 +26,10 @@ describe('distance math', () => {
     expect(zipFromText('Waxhaw and Union County locations')).toBe('')
   })
 
-  it('bundles ZIP centers around Waxhaw, including Monroe and south Charlotte', () => {
-    for (const zip of ['28173', '28110', '28112', '28104', '28277']) expect(ZIP_CENTROIDS[zip]).toBeTruthy()
+  it('bundles ZIP centers across Waxhaw, Charlotte and neighboring communities', () => {
+    for (const zip of ['28173', '28110', '28112', '28104', '28202', '28277', '29707']) expect(ZIP_CENTROIDS[zip]).toBeTruthy()
+    expect(originFromZip('28202')).toMatchObject({ label: 'Charlotte, NC', source: 'zip' })
+    expect(originFromZip('29707')).toMatchObject({ label: 'Fort Mill, SC', source: 'zip' })
     expect(originFromZip('90210')).toBeNull()
     expect(originFromZip('2817')).toBeNull()
   })

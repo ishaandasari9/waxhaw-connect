@@ -260,6 +260,11 @@ h3 { line-height: 1.2; }
 .hero-search button svg { margin: 0; width: 1rem; color: inherit; }
 .popular-searches { display: flex; flex-wrap: wrap; justify-content: center; gap: .35rem 1rem; margin-top: .9rem; font-size: .8rem; }
 .popular-searches a { text-underline-offset: 3px; }
+.home-location.distance-bar { align-items: center; margin-block: 1.25rem; }
+.home-location__intro { flex: 1 1 28rem; max-width: 34rem; }
+.home-location .location-picker { flex: 1 1 42rem; }
+.home-location__intro h2 { margin: .15rem 0 .25rem; font-size: 1.55rem; }
+.home-location__intro p { margin: 0; color: var(--ink-soft); font-size: .82rem; }
 
 .urgent-band { min-height: 7rem; display: grid; grid-template-columns: minmax(14rem, 1fr) minmax(28rem, 2.2fr) auto; align-items: center; gap: 1.8rem; padding: 1.2rem max(1rem, calc((100vw - 1320px) / 2)); background: var(--danger-light); border-block: 1px solid oklch(82% .065 30); }
 .urgent-band__intro { display: flex; align-items: center; gap: .8rem; }
@@ -342,6 +347,7 @@ h3 { line-height: 1.2; }
 .event-row > div strong, .event-row > div small { display: block; }
 .event-row > div strong { font-size: .82rem; }
 .event-row > div small { color: var(--ink-soft); font-size: .67rem; }
+.event-row .distance-tag { margin-top: .35rem; font-size: .65rem; }
 .trust-strip { width: min(100% - 2rem, 1320px); margin: 1rem auto 4rem; padding: 1.2rem 1.5rem; display: flex; align-items: center; gap: 1rem; background: var(--paper-deep); border-block: 1px solid var(--border); }
 .trust-strip > svg { width: 2rem; color: var(--forest); }
 .trust-strip strong, .trust-strip span { display: block; }
@@ -699,6 +705,8 @@ footer { background: var(--fill-deep); color: var(--on-accent); padding: 3rem ma
 @media (max-width: 1120px) {
   .nav > a { padding-inline: .55rem; font-size: .82rem; }
   .brand small { display: none; }
+  .home-location.distance-bar { align-items: flex-start; }
+  .home-location__intro, .home-location .location-picker { flex-basis: 100%; max-width: none; }
   .urgent-band { grid-template-columns: 1fr auto; }
   .urgent-band__links { grid-column: 1 / -1; grid-row: 2; }
   .category-rail { grid-template-columns: repeat(5, 1fr); }

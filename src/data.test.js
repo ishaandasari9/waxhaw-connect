@@ -28,6 +28,9 @@ describe('community resource data', () => {
   })
 
   it('keeps event links traceable and dates valid', () => {
+    const ids = events.map((event) => event.id)
+    expect(new Set(ids).size).toBe(ids.length)
+
     for (const event of events) {
       /* A listing carries either a single date or a repeating schedule. */
       if (event.recurrence) {
@@ -42,6 +45,14 @@ describe('community resource data', () => {
       expect(event.sourceUrl.startsWith('https://')).toBe(true)
       expect(event.location).toBeTruthy()
       expect(event.descriptionEs.length).toBeGreaterThan(20)
+    }
+  })
+
+  it('includes events from Waxhaw and neighboring communities', () => {
+    const eventPlaces = events.map((event) => `${event.location} ${event.address ?? ''}`.toLowerCase())
+
+    for (const community of ['waxhaw', 'monroe', 'indian trail', 'matthews']) {
+      expect(eventPlaces.some((place) => place.includes(community))).toBe(true)
     }
   })
 })

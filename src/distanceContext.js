@@ -26,7 +26,7 @@ export function useDistanceState() {
   const setZip = useCallback((value) => {
     const trimmed = String(value || '').trim()
     if (!/^\d{5}$/.test(trimmed)) return { ok: false, error: 'Enter a 5-digit ZIP code, like 28173.' }
-    if (!originFromZip(trimmed)) return { ok: false, error: 'Distances are available for ZIP codes within about 45 miles of Waxhaw.' }
+    if (!originFromZip(trimmed)) return { ok: false, error: 'Distances are available across Charlotte, Waxhaw and nearby communities.' }
     setDeviceOrigin(null)
     setZipValue(trimmed)
     return { ok: true }
