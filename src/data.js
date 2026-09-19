@@ -1,14 +1,14 @@
 export const categories = [
-  { id: 'basic-needs', label: 'Basic needs', labelEs: 'Necesidades básicas', blurb: 'Food, bills and essentials' },
-  { id: 'children', label: 'Children & youth', labelEs: 'Niños y jóvenes', blurb: 'Learning, care and activities' },
-  { id: 'families', label: 'Families', labelEs: 'Familias', blurb: 'Parenting and child care' },
-  { id: 'health', label: 'Health & wellness', labelEs: 'Salud y bienestar', blurb: 'Medical and mental health' },
-  { id: 'older-adults', label: 'Older adults', labelEs: 'Adultos mayores', blurb: 'Aging with support' },
-  { id: 'jobs', label: 'Jobs & money', labelEs: 'Empleo y finanzas', blurb: 'Training and financial stability' },
-  { id: 'housing', label: 'Housing', labelEs: 'Vivienda', blurb: 'Rent, utilities and shelter' },
-  { id: 'transportation', label: 'Transportation', labelEs: 'Transporte', blurb: 'Rides and mobility' },
-  { id: 'community', label: 'Community life', labelEs: 'Vida comunitaria', blurb: 'Parks, programs and connection' },
-  { id: 'education', label: 'Education', labelEs: 'Educación', blurb: 'Schools and lifelong learning' },
+  { id: 'basic-needs', label: 'Basic needs', labelEs: 'Necesidades básicas', blurb: 'Food, bills and essentials', blurbEs: 'Comida, facturas y necesidades básicas' },
+  { id: 'children', label: 'Children & youth', labelEs: 'Niños y jóvenes', blurb: 'Learning, care and activities', blurbEs: 'Aprendizaje, cuidado y actividades' },
+  { id: 'families', label: 'Families', labelEs: 'Familias', blurb: 'Parenting and child care', blurbEs: 'Crianza y cuidado infantil' },
+  { id: 'health', label: 'Health & wellness', labelEs: 'Salud y bienestar', blurb: 'Medical and mental health', blurbEs: 'Salud médica y mental' },
+  { id: 'older-adults', label: 'Older adults', labelEs: 'Adultos mayores', blurb: 'Aging with support', blurbEs: 'Envejecer con apoyo' },
+  { id: 'jobs', label: 'Jobs & money', labelEs: 'Empleo y finanzas', blurb: 'Training and financial stability', blurbEs: 'Capacitación y estabilidad económica' },
+  { id: 'housing', label: 'Housing', labelEs: 'Vivienda', blurb: 'Rent, utilities and shelter', blurbEs: 'Renta, servicios y vivienda' },
+  { id: 'transportation', label: 'Transportation', labelEs: 'Transporte', blurb: 'Rides and mobility', blurbEs: 'Transporte y movilidad' },
+  { id: 'community', label: 'Community life', labelEs: 'Vida comunitaria', blurb: 'Parks, programs and connection', blurbEs: 'Parques, programas y comunidad' },
+  { id: 'education', label: 'Education', labelEs: 'Educación', blurb: 'Schools and lifelong learning', blurbEs: 'Escuelas y aprendizaje continuo' },
 ]
 
 export const resources = [
@@ -415,11 +415,11 @@ export const events = [
 ]
 
 export const urgentLinks = [
-  { label: 'Immediate danger', detail: 'Call 911', phone: '911' },
-  { label: 'Mental health crisis', detail: 'Call or text 988', phone: '988' },
-  { label: 'Domestic violence', detail: 'Turning Point: 704-283-7233', phone: '7042837233' },
-  { label: 'Sexual assault', detail: 'Turning Point: 704-283-7770', phone: '7042837770' },
-  { label: 'Poison Control', detail: '1-800-222-1222', phone: '18002221222' },
+  { label: 'Immediate danger', labelEs: 'Peligro inmediato', detail: 'Call 911', detailEs: 'Llame al 911', phone: '911' },
+  { label: 'Mental health crisis', labelEs: 'Crisis de salud mental', detail: 'Call or text 988', detailEs: 'Llame o mande un texto al 988', phone: '988' },
+  { label: 'Domestic violence', labelEs: 'Violencia doméstica', detail: 'Turning Point: 704-283-7233', detailEs: 'Turning Point: 704-283-7233', phone: '7042837233' },
+  { label: 'Sexual assault', labelEs: 'Agresión sexual', detail: 'Turning Point: 704-283-7770', detailEs: 'Turning Point: 704-283-7770', phone: '7042837770' },
+  { label: 'Poison Control', labelEs: 'Centro de Envenenamiento', detail: '1-800-222-1222', detailEs: '1-800-222-1222', phone: '18002221222' },
 ]
 
 export const sourceNotes = [

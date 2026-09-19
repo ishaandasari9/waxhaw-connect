@@ -40,7 +40,7 @@ const copy = {
     upcoming: 'Upcoming in Waxhaw', viewAll: 'View all resources', openNow: 'Open now', closedNow: 'Closed now',
     darkMode: 'Dark mode', lightMode: 'Light mode', switchDark: 'Switch to dark mode', switchLight: 'Switch to light mode', theme: 'Appearance', themeSystem: 'Device', themeLight: 'Light', themeDark: 'Dark',
     assist: { needHelp: 'Need help?', communityHelper: 'Community helper', closeHelper: 'Close helper', planningTitle: 'Planning a community event?', planningIntro: 'See what made similar events work in other towns, then get a step-by-step plan for Waxhaw.', openPlanner: 'Open the event planner', panel: { heading: 'Describe your situation', intro: 'If you are not sure what to search for, say what is going on in your own words and we will point you to listings that may fit.', label: 'What is happening?', placeholder: 'For example: my mother stopped driving and cannot get to her appointments', looking: 'Looking', find: 'Find listings', hint: "Suggestions come from this site's verified directory. Every detail shown below is from the listing itself.", loading: 'Looking through the directory.', oneResult: '1 suggested listing below.', manyResults: '{count} suggested listings below.', noMatch: 'No close match found.', urgentStatus: 'Urgent help options shown below.', urgentTitle: 'If someone is in danger, get help now', urgentIntro: 'Call 911 for an emergency. Call or text 988 for the Suicide and Crisis Lifeline.', urgentLink: 'See urgent help', fallback: 'Showing keyword matches. The guided finder may work better for this.', emptyTitle: 'We could not find a close match', emptyIntro: 'Try the guided finder, or call NC 211 to speak with a specialist.', finderLink: 'Use guided finder' } },
-    resourcesPage: { intro: 'Search trusted organizations, programs and services serving Waxhaw and Union County.', filters: 'Filters', filtersLabel: 'Resource filters', filterResources: 'Filter resources', clearAll: 'Clear all', topic: 'Topic', allTopics: 'All topics', audience: 'Who is this for?', everyone: 'Everyone', children: 'Children', families: 'Families', adults: 'Adults', olderAdults: 'Older adults', veterans: 'Veterans', cost: 'Cost', anyCost: 'Any cost', free: 'Free or free to apply', varies: 'Varies', filterHelp: 'Not sure which filters to use?', filterHelpIntro: 'Our guided finder asks plain-language questions.', helpChoose: 'Help me choose', checked: 'Checked' },
+    resourcesPage: { title: 'Find the right support', intro: 'Search trusted organizations, programs and services serving Waxhaw and Union County.', filters: 'Filters', filtersLabel: 'Resource filters', filterResources: 'Filter resources', clearAll: 'Clear all', topic: 'Topic', allTopics: 'All topics', audience: 'Who is this for?', everyone: 'Everyone', children: 'Children', families: 'Families', adults: 'Adults', olderAdults: 'Older adults', veterans: 'Veterans', cost: 'Cost', anyCost: 'Any cost', free: 'Free or free to apply', varies: 'Varies', filterHelp: 'Not sure which filters to use?', filterHelpIntro: 'Our guided finder asks plain-language questions.', helpChoose: 'Help me choose', checked: 'Checked' },
     footer: { intro: 'One welcoming place for Waxhaw resources, events and opportunities.', findSupport: 'Find support', resourceDirectory: 'Resource directory', guidedFinder: 'Guided finder', urgentHelp: 'Urgent help', community: 'Community', events: 'Events', savedPlan: 'Saved plan', sourcesMethod: 'Sources and method', alwaysAvailable: 'Always available', call211: 'Call NC 211', call988: 'Call or text 988', emergency: 'Emergency: 911', project: 'is an independent student-designed community resource project.', tagline: 'Rooted in community. Focused on what’s next.' },
     verificationReviewed: 'Directory reviewed',
     savedPreview: { title: 'Your saved plan', one: '1 resource is ready when you need it.', many: '{count} resources are ready when you need them.', empty: 'Save resources and build a practical next-step list.', view: 'View your saved items' },
@@ -51,6 +51,73 @@ const copy = {
     signInRequired: { eyebrow: 'Account required', action: 'Sign in or create account', back: 'Back to events' },
     savedPlan: { eyebrow: 'Your saved plan', title: 'Keep your next steps together', intro: 'Saved resources stay on this device. Print the plan or return whenever you are ready.', one: '1 saved resource', many: '{count} saved resources', print: 'Print action plan', call: 'Call', remove: 'Remove', emptyTitle: 'Your plan is ready when you are', emptyIntro: 'Save useful resources as you browse. They will appear here as a clear, printable next-step list.', explore: 'Explore resources', finder: 'Use guided finder' },
     eventPlanner: { eyebrow: 'Event planner', title: 'Plan an event people will show up for', intro: 'Describe what you have in mind. We look up similar events in other towns, show why they worked, and turn that into a plan for Waxhaw.', kind: 'What kind of event do you want to host?', ideaPlaceholder: 'A Saturday morning makers market with local food trucks and live music', audience: 'Who is it for?', optional: '(optional)', audiencePlaceholder: 'Families with young kids', size: 'Expected size', unsure: 'Not sure yet', budget: 'Budget', season: 'Season', success: 'What would make it a success?', successPlaceholder: 'Neighbors meet each other and local vendors make sales', looking: 'Looking up similar events', build: 'Build my plan', startOver: 'Start over', hint: "Takes about 15 seconds. Don't include names, phone numbers or addresses.", how: 'How the planner works', describeTitle: 'Describe your event.', describe: 'A sentence is enough. Size and budget sharpen the advice.', elsewhereTitle: 'See what worked elsewhere.', elsewhere: 'A live search finds similar events in other towns, with links to where each detail came from.', waxhawTitle: 'Get a plan for Waxhaw.', waxhaw: 'Steps in order, then one click to start your calendar listing.', searching: 'Searching for similar events and reading what made them work.', planHeading: 'Your event plan', worked: 'What worked elsewhere', source: 'Source', sources: 'Sources', noClose: 'The search did not turn up events close enough to yours to compare. The plan below is still built for your idea.', noConfirmed: 'We could not confirm real examples with a live search this time, so none are shown. The plan below is still built for your idea.', yourPlan: 'Your plan for Waxhaw', grounded: 'These ideas are AI-generated from public web pages.', ungrounded: 'These ideas are AI-generated and were not checked against any source this time.', confirm: 'Confirm permits, venues and costs with the', town: 'Town of Waxhaw', confirmEnd: 'before you book anything.', post: 'Post this event', back: 'Back to the calendar', everyPage: 'Every page the search used', sizes: { 'Under 25 people': 'Under 25 people', '25 to 100 people': '25 to 100 people', '100 to 500 people': '100 to 500 people', 'More than 500 people': 'More than 500 people' }, budgets: { 'Free or almost free': 'Free or almost free', 'Under $500': 'Under $500', '$500 to $5,000': '$500 to $5,000', 'More than $5,000': 'More than $5,000' }, seasons: { 'Not sure yet': 'Not sure yet', Spring: 'Spring', Summer: 'Summer', Fall: 'Fall', Winter: 'Winter' }, failures: { limit: 'You have made several plans in the last hour. Wait a little while, then try again.', offline: 'The planner needs an internet connection to look up other events. Reconnect and try again.', error: 'The planner could not build a plan this time. Try again, or describe your event in a different way.' } },
+    popularSearches: ['Food assistance', 'Housing help', 'Mental health', 'After-school programs', 'Senior services'],
+    trust: { title: 'Built on verified local information', body: 'Sources are clearly labeled, and every listing shows when it was checked.', link: 'See our sources' },
+    pageTitles: {
+      '/': '', '/resources': 'Resource directory', '/finder': 'Guided resource finder', '/events': 'Community events',
+      '/events/new': 'Post a community event', '/events/plan': 'Event planner', '/login': 'Sign in',
+      '/account': 'Your account', '/saved': 'Your saved plan', '/about': 'Sources and methodology', '/urgent': 'Urgent support',
+    },
+    urgentPage: {
+      eyebrow: 'Urgent support', title: 'You do not have to handle this alone',
+      intro: 'Use the options below for immediate assistance. If someone is in immediate danger or needs emergency medical help, call 911.',
+      safetyTitle: 'Safety and privacy',
+      safetyBody: 'If you are viewing this page in an unsafe situation, use a device the other person cannot access when possible. Browser history may record your visit. Turning Point keeps its shelter location confidential.',
+      safetyLink: 'Visit Turning Point',
+      disclaimerLead: 'This directory is not an emergency service.',
+      disclaimerBody: 'Information is provided to help residents find official support. Availability and eligibility can change, so confirm details with the provider.',
+    },
+    auth: {
+      eyebrow: 'Your Waxhaw', title: 'A calendar that gets to know you',
+      intro: 'Save your interests, see better event matches, and share gatherings with the community.',
+      points: ['Recommendations based only on interests you choose', 'Clear reasons for every suggested event', 'One account, on any device you sign in from'],
+      tabs: 'Account access', signIn: 'Sign in', create: 'Create account',
+      createHeading: 'Create your free account', signInHeading: 'Welcome back',
+      createIntro: 'A few details will make your event feed useful from day one.',
+      signInIntro: 'Sign in to see your interests and community posts.',
+      name: 'Full name', namePlaceholder: 'Jordan Lee', email: 'Email address', password: 'Password',
+      passwordPlaceholder: 'At least 8 characters', wait: 'Please wait…',
+      shortPassword: 'Use at least 8 characters for your password.',
+      noInterests: 'Choose at least one event interest.',
+      unavailable: 'Accounts are unavailable right now. You can still browse every resource, use the guided finder and build a saved plan on this device.',
+      privacy: 'Your password is handled by a secure authentication service and never stored by this website. We keep only your name and the event interests you choose.',
+      interestsLegend: 'What kinds of events interest you?', interestsHint: 'Choose as many as you like. You can change these later.',
+    },
+    account: {
+      eyebrow: 'Your account', hello: 'Hello', intro: 'Control what shapes your recommendations and manage your community participation.',
+      personalizedTitle: 'Personalized event feed', personalizedHint: 'Bring your selected interests to the top of the calendar.',
+      saving: 'Saving…', save: 'Save preferences', signOut: 'Sign out',
+      howTitle: 'How recommendations work',
+      howBody: 'compares the categories you choose with each event’s category. Matches move higher in your feed and always include a plain-language reason.',
+      howPrivacy: 'We do not infer sensitive traits or track activity across other websites.',
+      feedLink: 'See my event feed',
+      signInTitle: 'Sign in to manage your profile',
+      signInIntro: 'Your interests and community event posts are tied to your account.',
+    },
+    accessibility: 'Accessibility', signIn: 'Sign in',
+    aboutPage: {
+      eyebrow: 'About', title: 'Trust should be visible',
+      intro: 'A community directory is only useful when people can understand where information came from, when it was checked and what to do next.',
+      purposeTitle: 'What this website is for',
+      purposeBody: 'brings organizations, programs, services, events and community resources into one inclusive experience. It supports residents across ages, abilities, backgrounds and levels of digital confidence.',
+      methodTitle: 'How information is selected',
+      steps: [
+        ['Start with authoritative sources', 'Official government, school, nonprofit and service-provider pages are preferred.'],
+        ['Write for real decisions', 'Each listing explains what the resource does, who it may serve, cost, contact details and what to confirm.'],
+        ['Show provenance', 'Every detail page links to its original source and displays the most recent review date.'],
+        ['Design for change', 'Residents are reminded to verify details because hours, eligibility and availability can change.'],
+      ],
+      sourcesTitle: 'Professionally legitimate sources',
+      asideTitle: 'Inclusive by default',
+      asideBody: 'The interface targets WCAG 2.2 Level AA with semantic landmarks, keyboard navigation, visible focus, contrast-safe colors, reduced motion, scalable text and plain language.',
+      watchTitle: 'What we watch',
+      watch: [
+        'Whether residents finish the guided finder',
+        'Searches that return nothing useful',
+        'How long it takes to reach a phone number',
+        'Task success on a phone and with a screen reader',
+      ],
+    },
     aboutMetrics: { link: 'See the current numbers', reviewed: 'Directory reviewed September 11, 2026', heading: 'How we measure success', intro: 'These figures are calculated live rather than written down. The directory numbers come from the listings themselves, and the speed numbers are measured on your device while you read this page.', content: 'Content quality', build: 'Build quality', speed: 'Speed on your device right now', target: 'Target', met: 'Target met', missed: 'Below target', context: 'For context', notMeasured: 'Not measured yet', measuring: 'Measuring', good: 'Good', orLess: 'or less', note: 'Interaction to next paint only appears once you have tapped or clicked something on this page. These measurements stay in your browser and are never sent anywhere.', testsValue: '{tests} across {files} files', buildRows: [{ label: 'Automated tests that run before every change', target: '50 or more', note: 'They cover the directory data, accounts, distances, event handling and the AI guardrails.' }, { label: 'Accessibility violations found in the last audit', target: '0', note: 'Automated axe-core scan against WCAG 2.2 AA on every page, in light and dark mode, at desktop and phone widths. Last run {date}.' }, { label: 'Third-party requests when a page loads', target: '0', note: 'Fonts, icons and colors all ship with the site, so no visitor data reaches another company and the site still works offline.' }], directoryRows: [{ label: 'Listings with a link to their original source', note: 'A resident can check every claim against the organization that made it.' }, { label: 'Listings verified in the last 90 days', note: 'Hours, eligibility and phone numbers change, so an unchecked listing is a wrong listing.' }, { label: 'Listings written in English and Spanish', note: 'Union County households speak Spanish at home in meaningful numbers.' }, { label: 'Days since the last directory review', note: 'Measured from the newest verification date in the directory.' }, { label: 'Upcoming events on the calendar', note: 'Past events are removed automatically, so this figure only counts events a resident could still attend.' }, { label: 'Listings a resident can travel to', note: 'The rest are phone, countywide or online services, plus one shelter whose location is confidential.' }], vitals: { lcp: { label: 'Largest contentful paint', hint: 'How long until the main content appears.' }, inp: { label: 'Interaction to next paint', hint: 'How quickly the page answers a tap or click.' }, cls: { label: 'Cumulative layout shift', hint: 'How much the page moves around while loading.' } } },
     distance: { directions: 'Get directions', newTab: ' (opens in a new tab)', distanceExact: 'Straight-line distance from your location', distanceZip: 'Approximate straight-line distance based on ZIP code', error1: 'Location access is off for this site. Enter a ZIP code instead.', error2: 'Your device could not find its location. Enter a ZIP code instead.', error3: 'Finding your location took too long. Try again or enter a ZIP code.', unavailable: 'Location is not available on this device. Enter a ZIP code instead.', invalidZip: 'Enter a 5-digit ZIP code, like 28173.', unsupportedZip: 'Distances are available for ZIP codes within about 45 miles of Waxhaw.', distancesFrom: 'Distances from', currentLocation: 'your current location', change: 'Change', stop: 'Stop showing distances', howFar: 'How far away is it?', zip: 'ZIP code', show: 'Show distances', or: 'or', locating: 'Locating', useLocation: 'Use my location', cancel: 'Cancel', hint: 'Your location stays in this browser. Distances are straight-line, not driving.', sort: 'Sort', nearest: 'Nearest first', within: 'Within', anyDistance: 'Any distance', mile: 'mile', miles: 'miles', inZip: 'In your ZIP code', under: 'Under 0.1 mi', underSpoken: 'Under 0.1 miles away', exactSpoken: '{miles} miles away', about: 'About {miles} mi', aboutSpoken: 'About {miles} {unit} away' },
     eventCategories: { Music: 'Music', Family: 'Family', Festival: 'Festival', Civic: 'Civic', Learning: 'Learning', Wellness: 'Wellness', Volunteering: 'Volunteering', Sports: 'Sports', 'Arts & Culture': 'Arts & Culture' },
@@ -68,7 +135,7 @@ const copy = {
     upcoming: 'Próximamente en Waxhaw', viewAll: 'Ver todos los recursos', openNow: 'Abierto ahora', closedNow: 'Cerrado ahora',
     darkMode: 'Modo oscuro', lightMode: 'Modo claro', switchDark: 'Cambiar a modo oscuro', switchLight: 'Cambiar a modo claro', theme: 'Apariencia', themeSystem: 'Dispositivo', themeLight: 'Claro', themeDark: 'Oscuro',
     assist: { needHelp: '¿Necesita ayuda?', communityHelper: 'Ayudante comunitario', closeHelper: 'Cerrar ayudante', planningTitle: '¿Está planificando un evento comunitario?', planningIntro: 'Vea qué hizo funcionar eventos similares en otras ciudades y obtenga un plan paso a paso para Waxhaw.', openPlanner: 'Abrir el planificador de eventos', panel: { heading: 'Describa su situación', intro: 'Si no sabe qué buscar, cuéntenos con sus propias palabras lo que sucede y le mostraremos opciones que podrían servirle.', label: '¿Qué está sucediendo?', placeholder: 'Por ejemplo: mi madre dejó de conducir y no puede llegar a sus citas', looking: 'Buscando', find: 'Buscar opciones', hint: 'Las sugerencias provienen del directorio verificado de este sitio. Cada detalle que aparece abajo viene del anuncio original.', loading: 'Buscando en el directorio.', oneResult: 'A continuación aparece 1 opción sugerida.', manyResults: 'A continuación aparecen {count} opciones sugeridas.', noMatch: 'No se encontró una coincidencia cercana.', urgentStatus: 'Las opciones de ayuda urgente aparecen abajo.', urgentTitle: 'Si alguien está en peligro, busque ayuda ahora', urgentIntro: 'Llame al 911 en una emergencia. Llame o envíe un mensaje de texto al 988 para comunicarse con la Línea de Prevención del Suicidio y Crisis.', urgentLink: 'Ver ayuda urgente', fallback: 'Se muestran coincidencias por palabras clave. La guía personalizada puede funcionar mejor.', emptyTitle: 'No pudimos encontrar una coincidencia cercana', emptyIntro: 'Pruebe la guía personalizada o llame a NC 211 para hablar con un especialista.', finderLink: 'Usar la guía personalizada' } },
-    resourcesPage: { intro: 'Busque organizaciones, programas y servicios confiables que atienden a Waxhaw y Union County.', filters: 'Filtros', filtersLabel: 'Filtros de recursos', filterResources: 'Filtrar recursos', clearAll: 'Borrar todo', topic: 'Tema', allTopics: 'Todos los temas', audience: '¿Para quién es?', everyone: 'Todas las personas', children: 'Niños', families: 'Familias', adults: 'Adultos', olderAdults: 'Adultos mayores', veterans: 'Veteranos', cost: 'Costo', anyCost: 'Cualquier costo', free: 'Gratis o solicitud gratuita', varies: 'Varía', filterHelp: '¿No sabe qué filtros usar?', filterHelpIntro: 'Nuestra guía personalizada hace preguntas en lenguaje sencillo.', helpChoose: 'Ayúdeme a elegir', checked: 'Revisado' },
+    resourcesPage: { title: 'Encuentre el apoyo indicado', intro: 'Busque organizaciones, programas y servicios confiables que atienden a Waxhaw y Union County.', filters: 'Filtros', filtersLabel: 'Filtros de recursos', filterResources: 'Filtrar recursos', clearAll: 'Borrar todo', topic: 'Tema', allTopics: 'Todos los temas', audience: '¿Para quién es?', everyone: 'Todas las personas', children: 'Niños', families: 'Familias', adults: 'Adultos', olderAdults: 'Adultos mayores', veterans: 'Veteranos', cost: 'Costo', anyCost: 'Cualquier costo', free: 'Gratis o solicitud gratuita', varies: 'Varía', filterHelp: '¿No sabe qué filtros usar?', filterHelpIntro: 'Nuestra guía personalizada hace preguntas en lenguaje sencillo.', helpChoose: 'Ayúdeme a elegir', checked: 'Revisado' },
     footer: { intro: 'Un lugar acogedor para los recursos, eventos y oportunidades de Waxhaw.', findSupport: 'Encuentre apoyo', resourceDirectory: 'Directorio de recursos', guidedFinder: 'Guía personalizada', urgentHelp: 'Ayuda urgente', community: 'Comunidad', events: 'Eventos', savedPlan: 'Plan guardado', sourcesMethod: 'Fuentes y método', alwaysAvailable: 'Siempre disponible', call211: 'Llamar a NC 211', call988: 'Llamar o enviar un mensaje al 988', emergency: 'Emergencias: 911', project: 'es un proyecto comunitario independiente diseñado por estudiantes.', tagline: 'Arraigado en la comunidad. Enfocado en lo que sigue.' },
     verificationReviewed: 'Directorio revisado el',
     savedPreview: { title: 'Su plan guardado', one: 'Tiene 1 recurso listo para cuando lo necesite.', many: 'Tiene {count} recursos listos para cuando los necesite.', empty: 'Guarde recursos y cree una lista práctica de próximos pasos.', view: 'Ver sus elementos guardados' },
@@ -79,6 +146,73 @@ const copy = {
     signInRequired: { eyebrow: 'Cuenta requerida', action: 'Iniciar sesión o crear una cuenta', back: 'Volver a eventos' },
     savedPlan: { eyebrow: 'Su plan guardado', title: 'Mantenga juntos sus próximos pasos', intro: 'Los recursos guardados permanecen en este dispositivo. Imprima el plan o vuelva cuando esté listo.', one: '1 recurso guardado', many: '{count} recursos guardados', print: 'Imprimir plan de acción', call: 'Llamar', remove: 'Eliminar', emptyTitle: 'Su plan está listo cuando usted lo esté', emptyIntro: 'Guarde recursos útiles mientras explora. Aparecerán aquí como una lista clara e imprimible de próximos pasos.', explore: 'Explorar recursos', finder: 'Usar la guía personalizada' },
     eventPlanner: { eyebrow: 'Planificador de eventos', title: 'Planifique un evento al que la gente quiera asistir', intro: 'Describa lo que tiene en mente. Buscamos eventos similares en otras ciudades, mostramos por qué funcionaron y convertimos esa información en un plan para Waxhaw.', kind: '¿Qué tipo de evento quiere organizar?', ideaPlaceholder: 'Un mercado de creadores el sábado por la mañana con camiones de comida local y música en vivo', audience: '¿Para quién es?', optional: '(opcional)', audiencePlaceholder: 'Familias con niños pequeños', size: 'Tamaño esperado', unsure: 'Aún no lo sé', budget: 'Presupuesto', season: 'Temporada', success: '¿Qué haría que fuera un éxito?', successPlaceholder: 'Los vecinos se conocen y los vendedores locales logran ventas', looking: 'Buscando eventos similares', build: 'Crear mi plan', startOver: 'Comenzar de nuevo', hint: 'Tarda unos 15 segundos. No incluya nombres, números de teléfono ni direcciones.', how: 'Cómo funciona el planificador', describeTitle: 'Describa su evento.', describe: 'Una oración es suficiente. El tamaño y el presupuesto mejoran las recomendaciones.', elsewhereTitle: 'Vea qué funcionó en otros lugares.', elsewhere: 'Una búsqueda en vivo encuentra eventos similares en otras ciudades, con enlaces a la fuente de cada detalle.', waxhawTitle: 'Obtenga un plan para Waxhaw.', waxhaw: 'Pasos en orden y luego un clic para comenzar su anuncio en el calendario.', searching: 'Buscando eventos similares y analizando qué los hizo funcionar.', planHeading: 'Su plan de evento', worked: 'Lo que funcionó en otros lugares', source: 'Fuente', sources: 'Fuentes', noClose: 'La búsqueda no encontró eventos suficientemente parecidos para comparar. El plan de abajo sigue adaptado a su idea.', noConfirmed: 'Esta vez no pudimos confirmar ejemplos reales con una búsqueda en vivo, así que no se muestra ninguno. El plan de abajo sigue adaptado a su idea.', yourPlan: 'Su plan para Waxhaw', grounded: 'Estas ideas fueron generadas por IA a partir de páginas web públicas.', ungrounded: 'Estas ideas fueron generadas por IA y esta vez no se comprobaron con ninguna fuente.', confirm: 'Confirme los permisos, lugares y costos con el', town: 'Town of Waxhaw', confirmEnd: 'antes de reservar.', post: 'Publicar este evento', back: 'Volver al calendario', everyPage: 'Todas las páginas utilizadas en la búsqueda', sizes: { 'Under 25 people': 'Menos de 25 personas', '25 to 100 people': 'De 25 a 100 personas', '100 to 500 people': 'De 100 a 500 personas', 'More than 500 people': 'Más de 500 personas' }, budgets: { 'Free or almost free': 'Gratis o casi gratis', 'Under $500': 'Menos de $500', '$500 to $5,000': 'De $500 a $5,000', 'More than $5,000': 'Más de $5,000' }, seasons: { 'Not sure yet': 'Aún no lo sé', Spring: 'Primavera', Summer: 'Verano', Fall: 'Otoño', Winter: 'Invierno' }, failures: { limit: 'Ha creado varios planes durante la última hora. Espere un poco y vuelva a intentarlo.', offline: 'El planificador necesita conexión a internet para buscar otros eventos. Vuelva a conectarse e inténtelo de nuevo.', error: 'El planificador no pudo crear un plan esta vez. Inténtelo de nuevo o describa su evento de otra manera.' } },
+    popularSearches: ['Ayuda con comida', 'Ayuda con vivienda', 'Salud mental', 'Programas después de clases', 'Servicios para adultos mayores'],
+    trust: { title: 'Basado en información local verificada', body: 'Las fuentes están claramente indicadas y cada ficha muestra cuándo se revisó.', link: 'Ver nuestras fuentes' },
+    pageTitles: {
+      '/': '', '/resources': 'Directorio de recursos', '/finder': 'Guía personalizada', '/events': 'Eventos comunitarios',
+      '/events/new': 'Publicar un evento', '/events/plan': 'Planificador de eventos', '/login': 'Iniciar sesión',
+      '/account': 'Su cuenta', '/saved': 'Su plan guardado', '/about': 'Fuentes y metodología', '/urgent': 'Ayuda urgente',
+    },
+    urgentPage: {
+      eyebrow: 'Ayuda urgente', title: 'No tiene que enfrentar esto solo',
+      intro: 'Use las opciones de abajo para recibir ayuda inmediata. Si alguien está en peligro inmediato o necesita atención médica de emergencia, llame al 911.',
+      safetyTitle: 'Seguridad y privacidad',
+      safetyBody: 'Si está viendo esta página en una situación insegura, use si es posible un dispositivo al que la otra persona no tenga acceso. El historial del navegador puede registrar su visita. Turning Point mantiene confidencial la ubicación de su refugio.',
+      safetyLink: 'Visitar Turning Point',
+      disclaimerLead: 'Este directorio no es un servicio de emergencia.',
+      disclaimerBody: 'La información se ofrece para ayudar a los residentes a encontrar apoyo oficial. La disponibilidad y los requisitos pueden cambiar, así que confirme los detalles con el proveedor.',
+    },
+    auth: {
+      eyebrow: 'Su Waxhaw', title: 'Un calendario que lo conoce',
+      intro: 'Guarde sus intereses, reciba mejores sugerencias de eventos y comparta reuniones con la comunidad.',
+      points: ['Recomendaciones basadas solo en los intereses que usted elige', 'Una razón clara para cada evento sugerido', 'Una sola cuenta, en cualquier dispositivo donde inicie sesión'],
+      tabs: 'Acceso a la cuenta', signIn: 'Iniciar sesión', create: 'Crear cuenta',
+      createHeading: 'Cree su cuenta gratuita', signInHeading: 'Bienvenido de nuevo',
+      createIntro: 'Con unos pocos datos su calendario será útil desde el primer día.',
+      signInIntro: 'Inicie sesión para ver sus intereses y sus publicaciones.',
+      name: 'Nombre completo', namePlaceholder: 'Jordan Lee', email: 'Correo electrónico', password: 'Contraseña',
+      passwordPlaceholder: 'Al menos 8 caracteres', wait: 'Un momento…',
+      shortPassword: 'Use al menos 8 caracteres para su contraseña.',
+      noInterests: 'Elija al menos un interés.',
+      unavailable: 'Las cuentas no están disponibles en este momento. Todavía puede ver todos los recursos, usar la guía personalizada y armar un plan guardado en este dispositivo.',
+      privacy: 'Su contraseña la maneja un servicio de autenticación seguro y este sitio nunca la guarda. Solo conservamos su nombre y los intereses que elija.',
+      interestsLegend: '¿Qué tipo de eventos le interesan?', interestsHint: 'Elija los que quiera. Puede cambiarlos después.',
+    },
+    account: {
+      eyebrow: 'Su cuenta', hello: 'Hola', intro: 'Controle lo que influye en sus recomendaciones y administre su participación en la comunidad.',
+      personalizedTitle: 'Calendario personalizado', personalizedHint: 'Pone los intereses que eligió al principio del calendario.',
+      saving: 'Guardando…', save: 'Guardar preferencias', signOut: 'Cerrar sesión',
+      howTitle: 'Cómo funcionan las recomendaciones',
+      howBody: 'compara las categorías que usted elige con la categoría de cada evento. Las coincidencias suben en su calendario y siempre incluyen una razón en lenguaje claro.',
+      howPrivacy: 'No deducimos características sensibles ni rastreamos su actividad en otros sitios.',
+      feedLink: 'Ver mi calendario',
+      signInTitle: 'Inicie sesión para administrar su perfil',
+      signInIntro: 'Sus intereses y los eventos que publique están vinculados a su cuenta.',
+    },
+    accessibility: 'Accesibilidad', signIn: 'Iniciar sesión',
+    aboutPage: {
+      eyebrow: 'Acerca de', title: 'La confianza debe verse',
+      intro: 'Un directorio comunitario solo sirve cuando las personas pueden entender de dónde vino la información, cuándo se revisó y qué hacer después.',
+      purposeTitle: 'Para qué sirve este sitio',
+      purposeBody: 'reúne organizaciones, programas, servicios, eventos y recursos comunitarios en un solo lugar accesible. Sirve a residentes de todas las edades, capacidades, orígenes y niveles de confianza con la tecnología.',
+      methodTitle: 'Cómo se elige la información',
+      steps: [
+        ['Empezamos por fuentes oficiales', 'Damos preferencia a páginas del gobierno, las escuelas, organizaciones sin fines de lucro y los propios proveedores.'],
+        ['Escribimos para decisiones reales', 'Cada ficha explica qué hace el recurso, a quién puede servir, el costo, los datos de contacto y qué conviene confirmar.'],
+        ['Mostramos la procedencia', 'Cada página de detalle enlaza a su fuente original y muestra la fecha de la última revisión.'],
+        ['Diseñamos para el cambio', 'Recordamos a los residentes que confirmen los detalles, porque los horarios, los requisitos y la disponibilidad cambian.'],
+      ],
+      sourcesTitle: 'Fuentes legítimas y profesionales',
+      asideTitle: 'Accesible desde el principio',
+      asideBody: 'La interfaz apunta al nivel AA de las WCAG 2.2, con estructura semántica, navegación por teclado, foco visible, colores con buen contraste, movimiento reducido, texto ampliable y lenguaje claro.',
+      watchTitle: 'Lo que vigilamos',
+      watch: [
+        'Si los residentes terminan la guía personalizada',
+        'Búsquedas que no devuelven nada útil',
+        'Cuánto tarda alguien en llegar a un número de teléfono',
+        'El éxito de las tareas en el teléfono y con lector de pantalla',
+      ],
+    },
     aboutMetrics: { link: 'Ver las cifras actuales', reviewed: 'Directorio revisado el 11 de septiembre de 2026', heading: 'Cómo medimos el éxito', intro: 'Estas cifras se calculan en vivo, no se escriben manualmente. Los números del directorio provienen de los propios anuncios y las cifras de velocidad se miden en su dispositivo mientras lee esta página.', content: 'Calidad del contenido', build: 'Calidad de la compilación', speed: 'Velocidad en su dispositivo ahora mismo', target: 'Objetivo', met: 'Objetivo cumplido', missed: 'Por debajo del objetivo', context: 'Como referencia', notMeasured: 'Aún no medido', measuring: 'Midiendo', good: 'Bueno', orLess: 'o menos', note: 'La interacción hasta la siguiente pintura solo aparece después de tocar o hacer clic en esta página. Estas mediciones permanecen en su navegador y nunca se envían a ningún sitio.', testsValue: '{tests} en {files} archivos', buildRows: [{ label: 'Pruebas automatizadas que se ejecutan antes de cada cambio', target: '50 o más', note: 'Cubren los datos del directorio, las cuentas, las distancias, el manejo de eventos y las medidas de seguridad de la IA.' }, { label: 'Infracciones de accesibilidad encontradas en la última auditoría', target: '0', note: 'Escaneo automatizado con axe-core según WCAG 2.2 AA en cada página, en modo claro y oscuro y con anchos de escritorio y teléfono. Última ejecución: {date}.' }, { label: 'Solicitudes a terceros al cargar una página', target: '0', note: 'Las fuentes, los iconos y los colores vienen incluidos con el sitio, por lo que ningún dato del visitante llega a otra empresa y el sitio sigue funcionando sin conexión.' }], directoryRows: [{ label: 'Anuncios con enlace a su fuente original', note: 'Cada residente puede comprobar las afirmaciones con la organización que las publicó.' }, { label: 'Anuncios verificados en los últimos 90 días', note: 'Los horarios, los requisitos y los números de teléfono cambian; un anuncio sin revisar puede ser incorrecto.' }, { label: 'Anuncios escritos en inglés y español', note: 'Una cantidad significativa de hogares de Union County habla español en casa.' }, { label: 'Días desde la última revisión del directorio', note: 'Se mide desde la fecha de verificación más reciente del directorio.' }, { label: 'Próximos eventos en el calendario', note: 'Los eventos pasados se eliminan automáticamente, por lo que esta cifra solo cuenta los eventos a los que todavía se puede asistir.' }, { label: 'Anuncios a los que un residente puede desplazarse', note: 'Los demás son servicios telefónicos, del condado o en línea, además de un refugio cuya ubicación es confidencial.' }], vitals: { lcp: { label: 'Renderizado del contenido principal', hint: 'Cuánto tarda en aparecer el contenido principal.' }, inp: { label: 'Interacción hasta la siguiente pintura', hint: 'Con qué rapidez responde la página a un toque o clic.' }, cls: { label: 'Cambio acumulado de diseño', hint: 'Cuánto se mueve la página mientras carga.' } } },
     distance: { directions: 'Cómo llegar', newTab: ' (se abre en una pestaña nueva)', distanceExact: 'Distancia en línea recta desde su ubicación', distanceZip: 'Distancia aproximada en línea recta según el código postal', error1: 'El acceso a la ubicación está desactivado para este sitio. Ingrese un código postal.', error2: 'Su dispositivo no pudo encontrar su ubicación. Ingrese un código postal.', error3: 'La búsqueda de su ubicación tardó demasiado. Inténtelo de nuevo o ingrese un código postal.', unavailable: 'La ubicación no está disponible en este dispositivo. Ingrese un código postal.', invalidZip: 'Ingrese un código postal de 5 dígitos, como 28173.', unsupportedZip: 'Las distancias están disponibles para códigos postales ubicados a unas 45 millas de Waxhaw.', distancesFrom: 'Distancias desde', currentLocation: 'su ubicación actual', change: 'Cambiar', stop: 'Dejar de mostrar distancias', howFar: '¿A qué distancia está?', zip: 'Código postal', show: 'Mostrar distancias', or: 'o', locating: 'Buscando', useLocation: 'Usar mi ubicación', cancel: 'Cancelar', hint: 'Su ubicación permanece en este navegador. Las distancias son en línea recta, no por carretera.', sort: 'Ordenar', nearest: 'Más cercanos primero', within: 'Dentro de', anyDistance: 'Cualquier distancia', mile: 'milla', miles: 'millas', inZip: 'En su código postal', under: 'Menos de 0.1 mi', underSpoken: 'A menos de 0.1 millas de distancia', exactSpoken: '{miles} millas de distancia', about: 'Aprox. {miles} mi', aboutSpoken: 'Aproximadamente {miles} {unit} de distancia' },
     eventCategories: { Music: 'Música', Family: 'Familia', Festival: 'Festival', Civic: 'Cívico', Learning: 'Aprendizaje', Wellness: 'Bienestar', Volunteering: 'Voluntariado', Sports: 'Deportes', 'Arts & Culture': 'Arte y cultura' },
@@ -301,24 +435,13 @@ function App() {
 
 function ScrollToTop() {
   const { pathname } = useLocation()
+  const { t } = useContext(AppContext)
   useEffect(() => {
     window.scrollTo({ top: 0, behavior: 'instant' })
-    const routeTitles = {
-      '/': SITE_HOME_TITLE,
-      '/resources': pageTitle('Resource directory'),
-      '/finder': pageTitle('Guided resource finder'),
-      '/events': pageTitle('Community events'),
-      '/events/new': pageTitle('Post a community event'),
-      '/events/plan': pageTitle('Event planner'),
-      '/login': pageTitle('Sign in'),
-      '/account': pageTitle('Your account'),
-      '/saved': pageTitle('Your saved plan'),
-      '/about': pageTitle('Sources and methodology'),
-      '/urgent': pageTitle('Urgent support'),
-    }
+    const routeTitles = Object.fromEntries(Object.entries(t.pageTitles).map(([route, label]) => [route, route === '/' ? SITE_HOME_TITLE : pageTitle(label)]))
     const detailResource = pathname.startsWith('/resources/') ? resources.find((item) => `/resources/${item.id}` === pathname) : null
     document.title = detailResource ? pageTitle(detailResource.name) : (routeTitles[pathname] || pageTitle('Page not found'))
-  }, [pathname])
+  }, [pathname, t])
   return null
 }
 
@@ -356,10 +479,10 @@ function Header() {
             {isDark ? <Sun size={16} /> : <Moon size={16} />} {isDark ? t.lightMode : t.darkMode}
           </button>
           <button className="utility-button" onClick={() => setAccessOpen(!accessOpen)} aria-expanded={accessOpen} aria-controls="accessibility-panel">
-            <Accessibility size={17} /> Accessibility
+            <Accessibility size={17} /> {t.accessibility}
           </button>
           <Link className="utility-button utility-account" to={currentUser ? '/account' : '/login'}>
-            {currentUser ? <UserRound size={16} /> : <LogIn size={16} />} {currentUser ? currentUser.name.split(' ')[0] : 'Sign in'}
+            {currentUser ? <UserRound size={16} /> : <LogIn size={16} />} {currentUser ? currentUser.name.split(' ')[0] : t.signIn}
           </Link>
         </div>
       </div>
@@ -454,7 +577,7 @@ function HomePage() {
           <h1>{language === 'es' ? <>Encuentre apoyo. Participe.<br />Siéntase en casa.</> : <>Find support. Join in.<br />Feel at home.</>}</h1>
           <p>{t.heroSub}</p>
           <HeroSearch />
-          <div className="popular-searches"><strong>{language === 'en' ? 'Popular searches:' : 'Búsquedas populares:'}</strong>{['Food assistance', 'Housing help', 'Mental health', 'After-school programs', 'Senior services'].map((item) => <Link key={item} to={`/resources?q=${encodeURIComponent(item)}`}>{item}</Link>)}</div>
+          <div className="popular-searches"><strong>{language === 'en' ? 'Popular searches:' : 'Búsquedas populares:'}</strong>{t.popularSearches.map((item) => <Link key={item} to={`/resources?q=${encodeURIComponent(item)}`}>{item}</Link>)}</div>
         </div>
       </section>
       <UrgentBand />
@@ -463,7 +586,7 @@ function HomePage() {
         <div className="category-rail">
           {categories.map((category) => {
             const Icon = categoryIcons[category.id]
-            return <Link key={category.id} to={`/resources?category=${category.id}`}><span><Icon /></span><strong>{language === 'es' ? category.labelEs : category.label}</strong><small>{category.blurb}</small></Link>
+            return <Link key={category.id} to={`/resources?category=${category.id}`}><span><Icon /></span><strong>{language === 'es' ? category.labelEs : category.label}</strong><small>{language === 'es' ? category.blurbEs : category.blurb}</small></Link>
           })}
         </div>
       </section>
@@ -478,18 +601,18 @@ function HomePage() {
           <EventsPreview />
         </div>
       </section>
-      <section className="trust-strip"><ShieldCheck /><div><strong>Built on verified local information</strong><span>Sources are clearly labeled, and every listing shows when it was checked.</span></div><Link to="/about#sources">See our sources <ArrowRight size={17} /></Link></section>
+      <section className="trust-strip"><ShieldCheck /><div><strong>{t.trust.title}</strong><span>{t.trust.body}</span></div><Link to="/about#sources">{t.trust.link} <ArrowRight size={17} /></Link></section>
     </>
   )
 }
 
 function UrgentBand() {
-  const { t } = useContext(AppContext)
+  const { language, t } = useContext(AppContext)
   return (
     <section className="urgent-band" aria-labelledby="urgent-title">
       <div className="urgent-band__intro"><span><CircleAlert /></span><div><h2 id="urgent-title">{t.urgent}</h2><p>{t.urgentSub}</p></div></div>
       <div className="urgent-band__links">
-        {urgentLinks.slice(0, 3).map((item) => <a key={item.label} href={`tel:${item.phone}`}><Phone size={20} /><span><strong>{item.label}</strong><small>{item.detail}</small></span></a>)}
+        {urgentLinks.slice(0, 3).map((item) => <a key={item.label} href={`tel:${item.phone}`}><Phone size={20} /><span><strong>{language === 'es' ? item.labelEs : item.label}</strong><small>{language === 'es' ? item.detailEs : item.detail}</small></span></a>)}
       </div>
       <Link className="button button--outline-danger" to="/urgent">View all urgent help <ArrowRight size={17} /></Link>
     </section>
@@ -605,7 +728,7 @@ function ResourcesPage() {
 
   return (
     <>
-      <PageHero eyebrow="Resource directory" title="Find the right support" intro={t.resourcesPage.intro} compact>
+      <PageHero eyebrow="Resource directory" title={t.resourcesPage.title} intro={t.resourcesPage.intro} compact>
         <form className="directory-search" onSubmit={submitSearch} role="search"><label htmlFor="directory-query">What do you need?</label><div><Search /><input id="directory-query" value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Try food, rides, child care or benefits" /><button className="button button--primary">{t.search}</button></div></form>
       </PageHero>
       <section className="directory-layout section">
@@ -743,12 +866,13 @@ function EventsPage() {
 }
 
 function InterestPicker({ selected, onChange }) {
+  const { t } = useContext(AppContext)
   const toggle = (interest) => onChange(selected.includes(interest) ? selected.filter((item) => item !== interest) : [...selected, interest])
-  return <fieldset className="interest-picker"><legend>What kinds of events interest you?</legend><p>Choose as many as you like. You can change these later.</p><div>{eventInterests.map((interest) => <label key={interest} className={selected.includes(interest) ? 'is-selected' : ''}><input type="checkbox" checked={selected.includes(interest)} onChange={() => toggle(interest)} /><span>{interest}</span><Check /></label>)}</div></fieldset>
+  return <fieldset className="interest-picker"><legend>{t.auth.interestsLegend}</legend><p>{t.auth.interestsHint}</p><div>{eventInterests.map((interest) => <label key={interest} className={selected.includes(interest) ? 'is-selected' : ''}><input type="checkbox" checked={selected.includes(interest)} onChange={() => toggle(interest)} /><span>{interest}</span><Check /></label>)}</div></fieldset>
 }
 
 function LoginPage() {
-  const { currentUser, authStatus, login, register } = useContext(AppContext)
+  const { currentUser, authStatus, login, register, t } = useContext(AppContext)
   const [params] = useSearchParams()
   const navigate = useNavigate()
   const [mode, setMode] = useState(params.get('mode') === 'signin' ? 'signin' : 'create')
@@ -763,8 +887,8 @@ function LoginPage() {
   const submit = async (event) => {
     event.preventDefault()
     setError('')
-    if (form.password.length < 8) return setError('Use at least 8 characters for your password.')
-    if (mode === 'create' && form.interests.length === 0) return setError('Choose at least one event interest.')
+    if (form.password.length < 8) return setError(t.auth.shortPassword)
+    if (mode === 'create' && form.interests.length === 0) return setError(t.auth.noInterests)
     setBusy(true)
     const result = mode === 'create' ? await register(form) : await login(form)
     setBusy(false)
@@ -772,11 +896,11 @@ function LoginPage() {
     navigate(returnTo, { replace: true })
   }
 
-  return <section className="section auth-shell"><div className="auth-intro"><span className="feature-icon"><Sparkles /></span><span className="eyebrow">Your Waxhaw</span><h1>A calendar that gets to know you</h1><p>Save your interests, see better event matches, and share gatherings with the community.</p><ul><li><Check /> Recommendations based only on interests you choose</li><li><Check /> Clear reasons for every suggested event</li><li><Check /> One account, on any device you sign in from</li></ul></div><form className="auth-form" onSubmit={submit}><div className="auth-tabs" role="tablist" aria-label="Account access"><button type="button" role="tab" aria-selected={mode === 'signin'} className={mode === 'signin' ? 'is-active' : ''} onClick={() => { setMode('signin'); setError('') }}>Sign in</button><button type="button" role="tab" aria-selected={mode === 'create'} className={mode === 'create' ? 'is-active' : ''} onClick={() => { setMode('create'); setError('') }}>Create account</button></div><div className="auth-form__heading"><h2>{mode === 'create' ? 'Create your free account' : 'Welcome back'}</h2><p>{mode === 'create' ? 'A few details will make your event feed useful from day one.' : 'Sign in to see your interests and community posts.'}</p></div>{mode === 'create' && <label>Full name<span className="input-wrap"><UserRound /><input required autoComplete="name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder="Jordan Lee" /></span></label>}<label>Email address<span className="input-wrap"><Mail /><input required type="email" autoComplete="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} placeholder="you@example.com" /></span></label><label>Password<span className="input-wrap"><LockKeyhole /><input required minLength="8" type="password" autoComplete={mode === 'create' ? 'new-password' : 'current-password'} value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} placeholder="At least 8 characters" /></span></label>{mode === 'create' && <InterestPicker selected={form.interests} onChange={(interests) => setForm({ ...form, interests })} />}{error && <p className="form-error" role="alert"><CircleAlert /> {error}</p>}<button className="button button--primary button--wide" disabled={busy || authStatus === 'unavailable'}>{busy ? 'Please wait…' : mode === 'create' ? 'Create account' : 'Sign in'} <ArrowRight /></button>{authStatus === 'unavailable' ? <p className="local-data-note" role="status"><CircleAlert /> Accounts are unavailable right now. You can still browse every resource, use the guided finder and build a saved plan on this device.</p> : <p className="local-data-note"><ShieldCheck /> Your password is handled by a secure authentication service and never stored by this website. We keep only your name and the event interests you choose.</p>}</form></section>
+  return <section className="section auth-shell"><div className="auth-intro"><span className="feature-icon"><Sparkles /></span><span className="eyebrow">{t.auth.eyebrow}</span><h1>{t.auth.title}</h1><p>{t.auth.intro}</p><ul>{t.auth.points.map((point) => <li key={point}><Check /> {point}</li>)}</ul></div><form className="auth-form" onSubmit={submit}><div className="auth-tabs" role="tablist" aria-label={t.auth.tabs}><button type="button" role="tab" aria-selected={mode === 'signin'} className={mode === 'signin' ? 'is-active' : ''} onClick={() => { setMode('signin'); setError('') }}>{t.auth.signIn}</button><button type="button" role="tab" aria-selected={mode === 'create'} className={mode === 'create' ? 'is-active' : ''} onClick={() => { setMode('create'); setError('') }}>{t.auth.create}</button></div><div className="auth-form__heading"><h2>{mode === 'create' ? t.auth.createHeading : t.auth.signInHeading}</h2><p>{mode === 'create' ? t.auth.createIntro : t.auth.signInIntro}</p></div>{mode === 'create' && <label>{t.auth.name}<span className="input-wrap"><UserRound /><input required autoComplete="name" value={form.name} onChange={(event) => setForm({ ...form, name: event.target.value })} placeholder={t.auth.namePlaceholder} /></span></label>}<label>{t.auth.email}<span className="input-wrap"><Mail /><input required type="email" autoComplete="email" value={form.email} onChange={(event) => setForm({ ...form, email: event.target.value })} placeholder="you@example.com" /></span></label><label>{t.auth.password}<span className="input-wrap"><LockKeyhole /><input required minLength="8" type="password" autoComplete={mode === 'create' ? 'new-password' : 'current-password'} value={form.password} onChange={(event) => setForm({ ...form, password: event.target.value })} placeholder={t.auth.passwordPlaceholder} /></span></label>{mode === 'create' && <InterestPicker selected={form.interests} onChange={(interests) => setForm({ ...form, interests })} />}{error && <p className="form-error" role="alert"><CircleAlert /> {error}</p>}<button className="button button--primary button--wide" disabled={busy || authStatus === 'unavailable'}>{busy ? t.auth.wait : mode === 'create' ? t.auth.create : t.auth.signIn} <ArrowRight /></button>{authStatus === 'unavailable' ? <p className="local-data-note" role="status"><CircleAlert /> {t.auth.unavailable}</p> : <p className="local-data-note"><ShieldCheck /> {t.auth.privacy}</p>}</form></section>
 }
 
 function AccountPage() {
-  const { currentUser, signOut, updateProfile } = useContext(AppContext)
+  const { currentUser, signOut, updateProfile, t } = useContext(AppContext)
   const navigate = useNavigate()
   const [interests, setInterests] = useState(currentUser?.interests || [])
   const [personalized, setPersonalized] = useState(currentUser?.personalized ?? true)
@@ -788,7 +912,7 @@ function AccountPage() {
     setInterests(currentUser.interests)
     setPersonalized(currentUser.personalized)
   }, [currentUser?.id, currentUser?.interests?.join('|'), currentUser?.personalized])
-  if (!currentUser) return <SignInRequired title="Sign in to manage your profile" intro="Your interests and community event posts are tied to your account." returnTo="/account" />
+  if (!currentUser) return <SignInRequired title={t.account.signInTitle} intro={t.account.signInIntro} returnTo="/account" labels={t.signInRequired} />
   const save = async (event) => {
     event.preventDefault()
     setBusy(true)
@@ -796,7 +920,7 @@ function AccountPage() {
     setBusy(false)
   }
   const logout = async () => { await signOut(); navigate('/events') }
-  return <><PageHero eyebrow="Your account" title={`Hello, ${currentUser.name.split(' ')[0]}`} intro="Control what shapes your recommendations and manage your community participation." compact /><section className="section account-layout"><form className="profile-panel" onSubmit={save}><div className="profile-identity"><span><UserRound /></span><div><h2>{currentUser.name}</h2><p>{currentUser.email}</p></div></div><label className="personalization-switch"><span><strong>Personalized event feed</strong><small>Bring your selected interests to the top of the calendar.</small></span><input type="checkbox" checked={personalized} onChange={(event) => setPersonalized(event.target.checked)} /></label><InterestPicker selected={interests} onChange={setInterests} /><div className="form-actions"><button className="button button--primary" disabled={busy}>{busy ? 'Saving…' : 'Save preferences'}</button><button type="button" className="button button--secondary" onClick={logout}><LogOut /> Sign out</button></div></form><aside className="account-aside"><Sparkles /><h2>How recommendations work</h2><p>{SITE_NAME} compares the categories you choose with each event’s category. Matches move higher in your feed and always include a plain-language reason.</p><p>We do not infer sensitive traits or track activity across other websites.</p><Link className="text-link" to="/events">See my event feed <ArrowRight /></Link></aside></section></>
+  return <><PageHero eyebrow={t.account.eyebrow} title={`${t.account.hello}, ${currentUser.name.split(' ')[0]}`} intro={t.account.intro} compact /><section className="section account-layout"><form className="profile-panel" onSubmit={save}><div className="profile-identity"><span><UserRound /></span><div><h2>{currentUser.name}</h2><p>{currentUser.email}</p></div></div><label className="personalization-switch"><span><strong>{t.account.personalizedTitle}</strong><small>{t.account.personalizedHint}</small></span><input type="checkbox" checked={personalized} onChange={(event) => setPersonalized(event.target.checked)} /></label><InterestPicker selected={interests} onChange={setInterests} /><div className="form-actions"><button className="button button--primary" disabled={busy}>{busy ? t.account.saving : t.account.save}</button><button type="button" className="button button--secondary" onClick={logout}><LogOut /> {t.account.signOut}</button></div></form><aside className="account-aside"><Sparkles /><h2>{t.account.howTitle}</h2><p>{SITE_NAME} {t.account.howBody}</p><p>{t.account.howPrivacy}</p><Link className="text-link" to="/events">{t.account.feedLink} <ArrowRight /></Link></aside></section></>
 }
 
 function SignInRequired({ title, intro, returnTo, labels }) {
@@ -873,10 +997,11 @@ function SavedPage() {
 }
 
 function UrgentPage() {
+  const { language, t } = useContext(AppContext)
   return (
     <>
-      <PageHero eyebrow="Urgent support" title="You do not have to handle this alone" intro="Use the options below for immediate assistance. If someone is in immediate danger or needs emergency medical help, call 911." compact danger />
-      <section className="section urgent-page"><div className="urgent-list">{urgentLinks.map((item) => <a key={item.label} href={`tel:${item.phone}`}><span><Phone /></span><div><strong>{item.label}</strong><small>{item.detail}</small></div><ArrowRight /></a>)}</div><article className="safety-note"><ShieldCheck /><div><h2>Safety and privacy</h2><p>If you are viewing this page in an unsafe situation, use a device the other person cannot access when possible. Browser history may record your visit. Turning Point keeps its shelter location confidential.</p><a href="https://turningpointnc.org/" target="_blank" rel="noreferrer">Visit Turning Point <ExternalLink /></a></div></article><div className="urgent-disclaimer"><Info /><p><strong>This directory is not an emergency service.</strong> Information is provided to help residents find official support. Availability and eligibility can change, so confirm details with the provider.</p></div></section>
+      <PageHero eyebrow={t.urgentPage.eyebrow} title={t.urgentPage.title} intro={t.urgentPage.intro} compact danger />
+      <section className="section urgent-page"><div className="urgent-list">{urgentLinks.map((item) => <a key={item.label} href={`tel:${item.phone}`}><span><Phone /></span><div><strong>{language === 'es' ? item.labelEs : item.label}</strong><small>{language === 'es' ? item.detailEs : item.detail}</small></div><ArrowRight /></a>)}</div><article className="safety-note"><ShieldCheck /><div><h2>{t.urgentPage.safetyTitle}</h2><p>{t.urgentPage.safetyBody}</p><a href="https://turningpointnc.org/" target="_blank" rel="noreferrer">{t.urgentPage.safetyLink} <ExternalLink /></a></div></article><div className="urgent-disclaimer"><Info /><p><strong>{t.urgentPage.disclaimerLead}</strong> {t.urgentPage.disclaimerBody}</p></div></section>
     </>
   )
 }
@@ -885,8 +1010,8 @@ function AboutPage() {
   const { language, t } = useContext(AppContext)
   return (
     <>
-      <PageHero eyebrow={`About ${SITE_NAME}`} title="Trust should be visible" intro="A community directory is only useful when people can understand where information came from, when it was checked and what to do next." compact />
-      <section className="section about-layout"><article><h2>What this website is for</h2><p>{SITE_NAME} brings organizations, programs, services, events and community resources into one inclusive experience. It supports residents across ages, abilities, backgrounds and levels of digital confidence.</p><h2>How information is selected</h2><ol className="method-list"><li><span>01</span><div><strong>Start with authoritative sources</strong><p>Official government, school, nonprofit and service-provider pages are preferred.</p></div></li><li><span>02</span><div><strong>Write for real decisions</strong><p>Each listing explains what the resource does, who it may serve, cost, contact details and what to confirm.</p></div></li><li><span>03</span><div><strong>Show provenance</strong><p>Every detail page links to its original source and displays the most recent review date.</p></div></li><li><span>04</span><div><strong>Design for change</strong><p>Residents are reminded to verify details because hours, eligibility and availability can change.</p></div></li></ol><h2 id="sources">Professionally legitimate sources</h2><div className="source-list">{sourceNotes.map((source) => <a key={source.name} href={source.url} target="_blank" rel="noreferrer"><span><strong>{source.name}</strong><small>{source.role}</small></span><ExternalLink /></a>)}</div></article><aside className="about-aside"><span className="feature-icon"><Accessibility /></span><h2>Inclusive by default</h2><p>The interface targets WCAG 2.2 Level AA with semantic landmarks, keyboard navigation, visible focus, contrast-safe colors, reduced motion, scalable text and plain language.</p><h3>What we watch</h3><ul><li>Whether residents finish the guided finder</li><li>Searches that return nothing useful</li><li>How long it takes to reach a phone number</li><li>Task success on a phone and with a screen reader</li></ul><a className="text-link" href="#metrics-heading">{t.aboutMetrics.link} <ArrowRight size={16} /></a><span className="review-stamp"><BadgeCheck /> {t.verificationReviewed} {formatVerificationDate(latestVerificationDate, language)}</span></aside></section><section className="section"><MetricsPanel copy={t.aboutMetrics} /></section>
+      <PageHero eyebrow={`${t.aboutPage.eyebrow} ${SITE_NAME}`} title={t.aboutPage.title} intro={t.aboutPage.intro} compact />
+      <section className="section about-layout"><article><h2>{t.aboutPage.purposeTitle}</h2><p>{SITE_NAME} {t.aboutPage.purposeBody}</p><h2>{t.aboutPage.methodTitle}</h2><ol className="method-list">{t.aboutPage.steps.map(([title, body], index) => <li key={title}><span>{String(index + 1).padStart(2, '0')}</span><div><strong>{title}</strong><p>{body}</p></div></li>)}</ol><h2 id="sources">{t.aboutPage.sourcesTitle}</h2><div className="source-list">{sourceNotes.map((source) => <a key={source.name} href={source.url} target="_blank" rel="noreferrer"><span><strong>{source.name}</strong><small>{source.role}</small></span><ExternalLink /></a>)}</div></article><aside className="about-aside"><span className="feature-icon"><Accessibility /></span><h2>{t.aboutPage.asideTitle}</h2><p>{t.aboutPage.asideBody}</p><h3>{t.aboutPage.watchTitle}</h3><ul>{t.aboutPage.watch.map((item) => <li key={item}>{item}</li>)}</ul><a className="text-link" href="#metrics-heading">{t.aboutMetrics.link} <ArrowRight size={16} /></a><span className="review-stamp"><BadgeCheck /> {t.verificationReviewed} {formatVerificationDate(latestVerificationDate, language)}</span></aside></section><section className="section"><MetricsPanel copy={t.aboutMetrics} /></section>
     </>
   )
 }
