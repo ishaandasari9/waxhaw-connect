@@ -30,8 +30,9 @@ export function normalizePlanInput(input = {}) {
 }
 
 /** Turns validated input into the message sent to the model. */
-export function describePlanRequest(plan) {
+export function describePlanRequest(plan, language) {
   return [
+    language === 'es' && 'Write the summary, steps and draft in Spanish.',
     `Event idea: ${plan.idea}`,
     plan.audience && `Who it is for: ${plan.audience}`,
     plan.size && `Expected size: ${plan.size}`,
@@ -65,91 +66,17 @@ export function parseJsonReply(text) {
 }
 
 /**
- * One entry per grounding chunk, index-aligned with the metadata so supports
- * can point at them. Unusable chunks stay as null to keep the indexes right.
+ * The only shape the browser ever receives. The model chooses which researched
+ * examples fit, by id; it never writes the examples themselves. An id it
+ * invents is dropped here, so a reader only ever sees entries from the
+ * hand-checked playbook.
  */
-export function chunkSources(metadata) {
-  const chunks = Array.isArray(metadata?.groundingChunks) ? metadata.groundingChunks : []
-  return chunks.map((chunk) => {
-    const web = chunk?.web
-    if (!web?.uri || !hostOf(web.uri)) return null
-    const label = clean(web.title, 80) || hostOf(web.uri)
-    return { url: String(web.uri).slice(0, 600), label }
-  })
-}
-
-const byteLength = (text) => new TextEncoder().encode(text).length
-
-/**
- * Finds which grounding chunks back each example. Gemini reports supports as
- * byte ranges of its reply, so each example's name marks where its slice of the
- * reply starts, and the next example (or the steps) marks where it ends.
- */
-export function citeExamples(replyText, names, metadata, sources) {
-  const supports = Array.isArray(metadata?.groundingSupports) ? metadata.groundingSupports : []
-  const text = String(replyText || '')
-  const starts = []
-  let cursor = 0
-  for (const name of names) {
-    const at = name ? text.indexOf(name, cursor) : -1
-    starts.push(at)
-    if (at >= 0) cursor = at + name.length
-  }
-  const stepsAt = text.indexOf('"steps"', Math.max(0, ...starts))
-
-  return starts.map((start, index) => {
-    if (start < 0) return []
-    const nextStart = starts.slice(index + 1).find((value) => value > start)
-    const end = nextStart ?? (stepsAt > start ? stepsAt : text.length)
-    const from = byteLength(text.slice(0, start))
-    const to = byteLength(text.slice(0, end))
-    const seen = new Set()
-    const cited = []
-    for (const support of supports) {
-      const segment = support?.segment || {}
-      const segStart = Number(segment.startIndex || 0)
-      const segEnd = Number(segment.endIndex || 0)
-      if (segEnd <= from || segStart >= to) continue
-      for (const chunkIndex of support.groundingChunkIndices || []) {
-        const source = sources[chunkIndex]
-        if (source && !seen.has(source.url)) {
-          seen.add(source.url)
-          cited.push(source)
-        }
-      }
-    }
-    return cited.slice(0, 3)
-  })
-}
-
-/**
- * The only shape the browser ever receives. Examples are kept only when the
- * reply was grounded in search, so an ungrounded answer cannot describe events
- * that may not exist.
- */
-export function sanitizePlan({ reply, replyText, metadata, categories }) {
-  const sources = chunkSources(metadata)
-  const allSources = []
+export function sanitizePlan({ reply, categories, allowedExamples = [] }) {
+  const clean = (value, max) => String(value ?? '').replace(/\s+/g, ' ').trim().slice(0, max)
   const seen = new Set()
-  for (const source of sources) {
-    if (source && !seen.has(source.url)) {
-      seen.add(source.url)
-      allSources.push(source)
-    }
-  }
-  const grounded = allSources.length > 0
-
-  const rawExamples = grounded && Array.isArray(reply?.examples) ? reply.examples.slice(0, 3) : []
-  const names = rawExamples.map((example) => clean(example?.name, 90))
-  const citations = citeExamples(replyText, names, metadata, sources)
-  const examples = rawExamples
-    .map((example, index) => ({
-      name: names[index],
-      place: clean(example?.place, 80),
-      why: (Array.isArray(example?.why) ? example.why : []).map((item) => clean(item, 160)).filter(Boolean).slice(0, 3),
-      sources: citations[index] || [],
-    }))
-    .filter((example) => example.name && example.why.length)
+  const exampleIds = (Array.isArray(reply?.exampleIds) ? reply.exampleIds : [])
+    .filter((id) => allowedExamples.includes(id) && !seen.has(id) && seen.add(id))
+    .slice(0, 3)
 
   const steps = (Array.isArray(reply?.steps) ? reply.steps : [])
     .map((step) => ({ title: clean(step?.title, 70), detail: clean(step?.detail, 260) }))
@@ -158,16 +85,9 @@ export function sanitizePlan({ reply, replyText, metadata, categories }) {
 
   const draft = {
     title: clean(reply?.draft?.title, 80),
-    category: pick(reply?.draft?.category, categories),
+    category: categories.includes(reply?.draft?.category) ? reply.draft.category : '',
     description: clean(reply?.draft?.description, 400),
   }
 
-  return {
-    summary: clean(reply?.summary, 300),
-    examples,
-    steps,
-    draft,
-    sources: allSources.slice(0, 8),
-    grounded,
-  }
+  return { summary: clean(reply?.summary, 300), exampleIds, steps, draft }
 }

@@ -1031,6 +1031,7 @@ html[data-motion='reduced'] *, html[data-motion='reduced'] *::before, html[data-
 .planner-example__sources svg, .planner-sources svg { width: .8rem; height: .8rem; flex: 0 0 auto; }
 .planner-note { margin: 0; padding: .9rem 1rem; background: var(--paper-deep); border-radius: var(--radius-sm); color: var(--ink-soft); font-size: .86rem; max-width: 65ch; }
 
+.planner-note--verified { display: flex; align-items: center; gap: .4rem; margin-bottom: .9rem; background: var(--forest-light); color: var(--forest-dark); font-weight: 700; }
 .planner-check { display: flex; gap: .7rem; padding: 1rem 1.1rem; background: var(--paper-deep); border: 1px solid var(--border); border-radius: var(--radius-md); }
 .planner-check svg { width: 1.3rem; height: 1.3rem; flex: 0 0 auto; color: var(--forest); }
 .planner-check p { margin: 0; font-size: .84rem; color: var(--ink-soft); }

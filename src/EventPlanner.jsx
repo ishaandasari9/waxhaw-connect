@@ -4,10 +4,15 @@ import { ArrowRight, CalendarPlus, CircleAlert, ExternalLink, Info, MapPin, Rota
 import PageHero from './PageHero.jsx'
 import { planEvent } from './assist.js'
 import { PLAN_BUDGETS, PLAN_SEASONS, PLAN_SIZES } from './planUtils.js'
+import { playbookEntry } from './eventPlaybook.js'
 
 export const PLAN_DRAFT_KEY = 'waxhaw-plan-draft'
 
 const EMPTY = { idea: '', audience: '', size: '', budget: '', season: 'Not sure yet', goal: '' }
+
+function selectedExamples(plan) {
+  return (plan?.exampleIds || []).map(playbookEntry).filter(Boolean)
+}
 
 export default function EventPlannerPage({ language, copy }) {
   const [form, setForm] = useState(EMPTY)
@@ -39,6 +44,8 @@ export default function EventPlannerPage({ language, copy }) {
 
   const busy = state.status === 'loading'
   const plan = state.plan
+  /* Example text comes from the checked playbook, never from the model. */
+  const examples = selectedExamples(plan)
 
   return (
     <>
@@ -140,35 +147,27 @@ export default function EventPlannerPage({ language, copy }) {
 
               <section className="planner-block" aria-labelledby="planner-examples">
                 <h3 id="planner-examples">{copy.worked}</h3>
-                {plan.examples.length ? (
-                  <div className="planner-examples">
-                    {plan.examples.map((example) => (
-                      <article key={example.name} className="planner-example">
-                        <h4>{example.name}</h4>
-                        {example.place && <p className="planner-example__place"><MapPin aria-hidden="true" /> {example.place}</p>}
-                        <ul>
-                          {example.why.map((reason) => <li key={reason}>{reason}</li>)}
-                        </ul>
-                        {example.sources.length > 0 && (
+                {examples.length ? (
+                  <>
+                    <p className="planner-note planner-note--verified">{copy.verified}</p>
+                    <div className="planner-examples">
+                      {examples.map((example) => (
+                        <article key={example.id} className="planner-example">
+                          <h4>{example.name}</h4>
+                          <p className="planner-example__place"><MapPin aria-hidden="true" /> {example.place}</p>
+                          <ul>
+                            {(language === 'es' ? example.whyEs : example.why).map((reason) => <li key={reason}>{reason}</li>)}
+                          </ul>
                           <p className="planner-example__sources">
-                            {example.sources.length > 1 ? copy.sources : copy.source}:{' '}
-                            {example.sources.map((source, index) => (
-                              <span key={source.url}>
-                                {index > 0 && ', '}
-                                <a href={source.url} target="_blank" rel="noreferrer">{source.label}<ExternalLink aria-hidden="true" /></a>
-                              </span>
-                            ))}
+                            {copy.source}:{' '}
+                            <a href={example.source.url} target="_blank" rel="noreferrer">{example.source.label}<ExternalLink aria-hidden="true" /></a>
                           </p>
-                        )}
-                      </article>
-                    ))}
-                  </div>
+                        </article>
+                      ))}
+                    </div>
+                  </>
                 ) : (
-                  <p className="planner-note">
-                    {plan.grounded
-                      ? copy.noClose
-                      : copy.noConfirmed}
-                  </p>
+                  <p className="planner-note">{copy.noClose}</p>
                 )}
               </section>
 
@@ -187,9 +186,7 @@ export default function EventPlannerPage({ language, copy }) {
               <div className="planner-check">
                 <ShieldCheck aria-hidden="true" />
                 <p>
-                  {plan.grounded
-                    ? copy.grounded
-                    : copy.ungrounded}{' '}
+                  {copy.grounded}{' '}
                   {copy.confirm}{' '}
                   <a href="https://www.waxhaw.com/" target="_blank" rel="noreferrer">{copy.town}</a> {copy.confirmEnd}
                 </p>
@@ -202,16 +199,6 @@ export default function EventPlannerPage({ language, copy }) {
                 <Link className="text-link" to="/events">{copy.back} <ArrowRight /></Link>
               </div>
 
-              {plan.sources.length > 0 && (
-                <details className="planner-sources">
-                  <summary>{copy.everyPage} ({plan.sources.length})</summary>
-                  <ul>
-                    {plan.sources.map((source) => (
-                      <li key={source.url}><a href={source.url} target="_blank" rel="noreferrer">{source.label}<ExternalLink aria-hidden="true" /></a></li>
-                    ))}
-                  </ul>
-                </details>
-              )}
             </>
           )}
         </div>

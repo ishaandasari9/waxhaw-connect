@@ -2,7 +2,7 @@
 
 Last updated: September 18, 2026 (chunk 3)
 Base commit for chunk 1: `eeeab23` (Planner: free-tier search model and fallback)
-Tests: 71 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark, desktop and phone.
+Tests: 72 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark, desktop and phone.
 
 ## Done
 
@@ -35,7 +35,7 @@ Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxha
 - [x] Apply the patches and push to `main`
 - [x] Confirm `GEMINI_API_KEY` is set in Vercel, redeploy, and run one real event plan.
 - [ ] Run `npm run stats` after adding tests so the About page figure stays current.
-- [ ] **Decide how the planner gets its examples.** Live search returns 429 on a free-tier key, and Google has retired the 2.5 models (which had free search) for new accounts. The planner falls back to a plan with no examples. Either turn on billing in Google AI Studio and set `PLAN_MODEL=gemini-3.5-flash-lite` in Vercel, or switch to a hand-researched list of real events the AI picks from.
+- [x] **Planner examples**: solved with a hand-researched playbook (`src/eventPlaybook.js`), so no billing and no live search. The AI picks from the list by id; an id it invents is dropped before the page renders.
 - [x] Run `npm run geocode` and commit `src/places.js`
 - [ ] Fix the library address. The site uses 1515 Cuthbertson Rd, but the library's own page says 1720.
   - [ ] Update both the resource and the library board event in `src/data.js`.
@@ -65,6 +65,7 @@ Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxha
 5. ~~**Content:** #2~~ Done Sept 19. Added Movie In The Park plus five recurring town meetings taken from the published schedule, so the calendar refills itself instead of emptying as events pass. The directory gaps (legal aid, newcomer and language support, volunteering, faith and civic groups, pets) are still open and are research, not code.
 6. ~~**Spanish:** #6~~ Done Sept 18, with Codex doing the bulk and the urgent, sign-in and About pages finished afterwards.
 7. **Backlog features, if time allows:**
+   - More playbook entries. Six is enough to cover common ideas; add one whenever you find a well-documented event.
    - A "Report outdated info" button on each resource
    - An "I'm going" RSVP count on events
    - A map view (the distance data now makes this easy)

@@ -99,7 +99,7 @@ Firebase web API keys are public by design and appear in the client bundle. Acce
 - Explainable event recommendations based only on interests residents choose
 - Community event posting that publishes to a shared calendar every visitor sees, with clear source labels and author-only removal
 - A floating community helper on every page that matches plain-language situations to verified listings
-- An AI event planner that uses live Google Search grounding to find similar events in other towns, explains why they worked, and turns that into a step-by-step plan that can prefill a calendar listing. Links come only from search grounding metadata, never from model-written text, and examples are hidden when a reply is not grounded
+- An AI event planner built on a researched playbook of events from nearby counties (`src/eventPlaybook.js`). The model only chooses which entries fit, by id, and writes the step-by-step plan; every example name, place, reason and source link on the page comes from the checked file, so an invented event cannot reach a reader. The plan can prefill a calendar listing
 - Source-verification dates and direct original-source links
 - Urgent-help pathway separated from everyday services
 - Offline app-shell caching for unreliable conference internet
