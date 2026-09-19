@@ -88,6 +88,7 @@ Firebase web API keys are public by design and appear in the client bundle. Acce
 - English and Spanish discovery content
 - Text-size, high-contrast and reduced-motion controls
 - Distances by ZIP code or device location on resources, events, the compare tray, the saved plan and the guided finder, with nearest-first sorting, a radius filter and directions links. ZIP centers are bundled (GeoNames, CC BY 4.0) so nothing a resident types leaves the browser, device coordinates are rounded and never stored, and confidential shelter locations never get a point, a distance or a directions link
+- A measured success section on the About page: directory figures computed from the listings themselves, test and accessibility results from the build, and Core Web Vitals measured in the reader's own browser with nothing sent anywhere
 - Self-hosted fonts, hex fallbacks for every oklch color, and a full icon set, so the site renders correctly offline and on older browsers
 - Light and dark themes that follow the device by default, with a one-click toggle, a pre-paint script to avoid a white flash, and printouts that always stay light. Both themes pass automated WCAG 2.2 AA contrast checks, including with high contrast turned on
 - Live open/closed indicators when reliable hours are available
@@ -110,6 +111,10 @@ npm run geocode
 ```
 
 This rewrites `src/places.js`. Any address the Census cannot match is listed and falls back to an approximate ZIP-based distance. `python3 scripts/build-zip-centroids.py` rebuilds the bundled ZIP table (requires `pip install zipcodes`).
+
+## Keeping the metrics honest
+
+`npm run stats` recounts the test suite and writes `src/qualityStats.js`, which the About page reads. Pass `--violations N` after an accessibility audit. Every other figure on that page is computed at render time from `src/data.js`, so it cannot go stale.
 
 ## Regenerating colors and icons
 

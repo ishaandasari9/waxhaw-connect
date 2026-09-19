@@ -2,7 +2,7 @@
 
 Last updated: September 18, 2026 (chunk 3)
 Base commit for chunk 1: `eeeab23` (Planner: free-tier search model and fallback)
-Tests: 51 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark, desktop and phone.
+Tests: 59 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark, desktop and phone.
 
 ## Done
 
@@ -28,6 +28,7 @@ Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxha
 
 - [x] Apply the patches and push to `main`
 - [x] Confirm `GEMINI_API_KEY` is set in Vercel, redeploy, and run one real event plan.
+- [ ] Run `npm run stats` after adding tests so the About page figure stays current.
 - [ ] **Decide how the planner gets its examples.** Live search returns 429 on a free-tier key, and Google has retired the 2.5 models (which had free search) for new accounts. The planner falls back to a plan with no examples. Either turn on billing in Google AI Studio and set `PLAN_MODEL=gemini-3.5-flash-lite` in Vercel, or switch to a hand-researched list of real events the AI picks from.
 - [x] Run `npm run geocode` and commit `src/places.js`
 - [ ] Fix the library address. The site uses 1515 Cuthbertson Rd, but the library's own page says 1720.
@@ -47,14 +48,14 @@ Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxha
 | 7 | Community posts have no report or moderation option | M | Open |
 | 8 | Fonts load from Google, `oklch()` colors have no fallbacks, and the manifest has no icons | M | Done (chunk 3) |
 | 9 | The Firebase bundle (556 kB) loads on every page | S | Done (chunk 3) |
-| 10 | Metrics has no targets or measurement (weakest rubric item, about 3/5) | M | Open |
+| 10 | Metrics has no targets or measurement (weakest rubric item, about 3/5) | M | Done (chunk 4) |
 
 ## Chunk plan (one chunk per session)
 
 1. ~~**Quick fixes:** #1, #3, #4, #5~~ Done Sept 18, along with the planner's source note and a bug where the flyer parser checked event categories against the resource list.
 2. **Moderation:** #7. Adds a report button, hides a post after a few reports, and updates `firestore.rules`.
 3. ~~**Performance and offline:** #8 and #9~~ Done Sept 18. Fonts are bundled, every color has a hex fallback, the app has real icons, and Firebase waits for an idle moment.
-4. **Metrics:** #10. Adds numeric targets, Core Web Vitals and a measured-vs-planned table on the About page.
+4. ~~**Metrics:** #10~~ Done Sept 18. The About page now computes its own figures, reports test and accessibility results, and measures Core Web Vitals on the reader's device. The one target currently missed is the number of upcoming events, which chunk 5 fixes.
 5. **Content:** #2 plus the directory gaps (legal aid, newcomer and language support, volunteering, faith and civic groups, pets)
 6. **Spanish:** #6
 7. **Backlog features, if time allows:**
