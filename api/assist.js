@@ -175,7 +175,10 @@ export default async function handler(req, res) {
   if (mode === 'plan') {
     const plan = normalizePlanInput(body.input)
     if (!plan) return res.status(400).json({ ok: false })
-    const request = describePlanRequest(plan)
+    const languageInstruction = body.language === 'es'
+      ? '\nResponse language: Write all user-facing text in Spanish. Keep draft.category exactly in the required English category list.'
+      : ''
+    const request = `${describePlanRequest(plan)}${languageInstruction}`
     let result = await callModel(PLAN_SYSTEM, request, {
       search: true,
       timeout: PLAN_TIMEOUT_MS,

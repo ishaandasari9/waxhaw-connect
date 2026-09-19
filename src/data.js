@@ -364,9 +364,11 @@ export const events = [
     location: 'Community Corner, 115 McDonald Street',
     category: 'Music',
     description: 'A free outdoor concert under the Water Tank featuring Darren Deese.',
+    descriptionEs: 'Un concierto gratuito al aire libre bajo el tanque de agua con Darren Deese.',
     sourceUrl: 'https://www.waxhaw.com/our-town/events/jammin-by-the-tracks',
     address: '115 McDonald Street, Waxhaw, NC 28173',
     accessibility: 'Outdoor venue; contact organizers for accommodations.',
+    accessibilityEs: 'Lugar al aire libre; comuníquese con los organizadores para solicitar adaptaciones.',
   },
   {
     id: 'library-board-sept',
@@ -376,9 +378,11 @@ export const events = [
     location: 'Southwest Regional Library, Waxhaw',
     category: 'Civic',
     description: 'A scheduled public meeting of the Union County Library Board of Trustees.',
+    descriptionEs: 'Una reunión pública programada de la Junta Directiva de la Biblioteca de Union County.',
     sourceUrl: 'https://www.unioncountync.gov/government/boards-committees/board-of-county-commissioners/commissioner-appointments-to-boards-committees',
     address: '1515 Cuthbertson Road, Waxhaw, NC 28173',
     accessibility: 'Accessible public building.',
+    accessibilityEs: 'Edificio público accesible.',
   },
   {
     id: 'autumn-treasures',
@@ -388,9 +392,11 @@ export const events = [
     location: 'Downtown Waxhaw',
     category: 'Festival',
     description: 'Waxhaw’s annual festival with local makers, music, food and a family area. Admission is free.',
+    descriptionEs: 'El festival anual de Waxhaw con creadores locales, música, comida y un área familiar. La entrada es gratuita.',
     sourceUrl: 'https://www.waxhaw.com/our-town/events/autumn-treasures',
     address: 'Downtown Waxhaw, NC 28173',
     accessibility: 'ADA parking is listed by the Town of Waxhaw.',
+    accessibilityEs: 'Town of Waxhaw publica información sobre estacionamiento accesible según la ADA.',
   },
   {
     id: 'christmas-parade',
@@ -400,9 +406,11 @@ export const events = [
     location: 'Downtown Waxhaw',
     category: 'Family',
     description: 'A community holiday parade hosted by the Town of Waxhaw.',
+    descriptionEs: 'Un desfile comunitario de temporada organizado por Town of Waxhaw.',
     sourceUrl: 'https://www.waxhaw.com/our-town/events/volunteering-at-events',
     address: 'Downtown Waxhaw, NC 28173',
     accessibility: 'Check the official event page for route and access updates.',
+    accessibilityEs: 'Consulte la página oficial del evento para ver actualizaciones sobre la ruta y el acceso.',
   },
 ]
 

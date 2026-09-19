@@ -658,6 +658,7 @@ h3 { line-height: 1.2; }
 .about-aside p, .about-aside li { color: var(--ink-soft); font-size: .83rem; }
 .about-aside h3 { margin-top: 2rem; }
 .about-aside ul { padding-left: 1.2rem; }
+.about-aside > .text-link { display: flex; width: fit-content; }
 .review-stamp { display: inline-flex; align-items: center; gap: .4rem; margin-top: 1rem; padding-top: 1rem; border-top: 1px solid var(--border); font-size: .7rem; font-weight: 700; }
 .review-stamp svg { width: 1rem; color: var(--success); }
 

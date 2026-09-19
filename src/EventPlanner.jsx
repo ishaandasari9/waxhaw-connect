@@ -9,13 +9,7 @@ export const PLAN_DRAFT_KEY = 'waxhaw-plan-draft'
 
 const EMPTY = { idea: '', audience: '', size: '', budget: '', season: 'Not sure yet', goal: '' }
 
-const FAILURE_COPY = {
-  limit: 'You have made several plans in the last hour. Wait a little while, then try again.',
-  offline: 'The planner needs an internet connection to look up other events. Reconnect and try again.',
-  error: 'The planner could not build a plan this time. Try again, or describe your event in a different way.',
-}
-
-export default function EventPlannerPage() {
+export default function EventPlannerPage({ language, copy }) {
   const [form, setForm] = useState(EMPTY)
   const [state, setState] = useState({ status: 'idle', plan: null, reason: '' })
   const resultsRef = useRef(null)
@@ -27,7 +21,7 @@ export default function EventPlannerPage() {
     event.preventDefault()
     if (!form.idea.trim()) return
     setState({ status: 'loading', plan: null, reason: '' })
-    const result = await planEvent(form)
+    const result = await planEvent(form, language)
     setState(result.ok ? { status: 'done', plan: result.plan, reason: '' } : { status: 'failed', plan: null, reason: result.reason })
     window.requestAnimationFrame(() => resultsRef.current?.focus())
   }
@@ -49,81 +43,81 @@ export default function EventPlannerPage() {
   return (
     <>
       <PageHero
-        eyebrow="Event planner"
-        title="Plan an event people will show up for"
-        intro="Describe what you have in mind. We look up similar events in other towns, show why they worked, and turn that into a plan for Waxhaw."
+        eyebrow={copy.eyebrow}
+        title={copy.title}
+        intro={copy.intro}
         compact
       />
 
       <section className="section planner">
         <form className="planner-form" onSubmit={submit}>
           <label className="planner-form__idea">
-            What kind of event do you want to host?
+            {copy.kind}
             <textarea
               required
               rows={3}
               maxLength={240}
               value={form.idea}
               onChange={update('idea')}
-              placeholder="A Saturday morning makers market with local food trucks and live music"
+              placeholder={copy.ideaPlaceholder}
             />
           </label>
 
           <div className="planner-form__grid">
             <label>
-              <span>Who is it for? <span className="optional">(optional)</span></span>
-              <input maxLength={120} value={form.audience} onChange={update('audience')} placeholder="Families with young kids" />
+              <span>{copy.audience} <span className="optional">{copy.optional}</span></span>
+              <input maxLength={120} value={form.audience} onChange={update('audience')} placeholder={copy.audiencePlaceholder} />
             </label>
             <label>
-              Expected size
+              {copy.size}
               <select value={form.size} onChange={update('size')}>
-                <option value="">Not sure yet</option>
-                {PLAN_SIZES.map((size) => <option key={size}>{size}</option>)}
+                <option value="">{copy.unsure}</option>
+                {PLAN_SIZES.map((size) => <option key={size} value={size}>{copy.sizes[size]}</option>)}
               </select>
             </label>
             <label>
-              Budget
+              {copy.budget}
               <select value={form.budget} onChange={update('budget')}>
-                <option value="">Not sure yet</option>
-                {PLAN_BUDGETS.map((budget) => <option key={budget}>{budget}</option>)}
+                <option value="">{copy.unsure}</option>
+                {PLAN_BUDGETS.map((budget) => <option key={budget} value={budget}>{copy.budgets[budget]}</option>)}
               </select>
             </label>
             <label>
-              Season
+              {copy.season}
               <select value={form.season} onChange={update('season')}>
-                {PLAN_SEASONS.map((season) => <option key={season}>{season}</option>)}
+                {PLAN_SEASONS.map((season) => <option key={season} value={season}>{copy.seasons[season]}</option>)}
               </select>
             </label>
           </div>
 
           <label>
-            <span>What would make it a success? <span className="optional">(optional)</span></span>
-            <input maxLength={240} value={form.goal} onChange={update('goal')} placeholder="Neighbors meet each other and local vendors make sales" />
+            <span>{copy.success} <span className="optional">{copy.optional}</span></span>
+            <input maxLength={240} value={form.goal} onChange={update('goal')} placeholder={copy.successPlaceholder} />
           </label>
 
           <div className="planner-form__actions">
             <button className="button button--primary" disabled={busy}>
-              <Search /> {busy ? 'Looking up similar events' : 'Build my plan'}
+              <Search /> {busy ? copy.looking : copy.build}
             </button>
             {state.status !== 'idle' && !busy && (
               <button type="button" className="button button--secondary" onClick={startOver}>
-                <RotateCcw /> Start over
+                <RotateCcw /> {copy.startOver}
               </button>
             )}
           </div>
           <p className="planner-form__hint">
-            <Info aria-hidden="true" /> Takes about 15 seconds. Don't include names, phone numbers or addresses.
+            <Info aria-hidden="true" /> {copy.hint}
           </p>
         </form>
 
         <div className="planner-output" ref={resultsRef} tabIndex={-1} aria-live="polite" aria-busy={busy}>
           {state.status === 'idle' && (
             <div className="planner-idle">
-              <h2>How the planner works</h2>
+              <h2>{copy.how}</h2>
               <ol>
-                <li><strong>Describe your event.</strong> A sentence is enough. Size and budget sharpen the advice.</li>
-                <li><strong>See what worked elsewhere.</strong> A live search finds similar events in other towns, with links to where each detail came from.</li>
-                <li><strong>Get a plan for Waxhaw.</strong> Steps in order, then one click to start your calendar listing.</li>
+                <li><strong>{copy.describeTitle}</strong> {copy.describe}</li>
+                <li><strong>{copy.elsewhereTitle}</strong> {copy.elsewhere}</li>
+                <li><strong>{copy.waxhawTitle}</strong> {copy.waxhaw}</li>
               </ol>
             </div>
           )}
@@ -131,21 +125,21 @@ export default function EventPlannerPage() {
           {busy && (
             <div className="planner-loading" role="status">
               <span className="planner-loading__bar" aria-hidden="true" />
-              <p>Searching for similar events and reading what made them work.</p>
+              <p>{copy.searching}</p>
             </div>
           )}
 
           {state.status === 'failed' && (
-            <p className="form-error" role="alert"><CircleAlert /> {FAILURE_COPY[state.reason] || FAILURE_COPY.error}</p>
+            <p className="form-error" role="alert"><CircleAlert /> {copy.failures[state.reason] || copy.failures.error}</p>
           )}
 
           {state.status === 'done' && plan && (
             <>
-              <h2 className="visually-hidden">Your event plan</h2>
+              <h2 className="visually-hidden">{copy.planHeading}</h2>
               {plan.summary && <p className="planner-summary">{plan.summary}</p>}
 
               <section className="planner-block" aria-labelledby="planner-examples">
-                <h3 id="planner-examples">What worked elsewhere</h3>
+                <h3 id="planner-examples">{copy.worked}</h3>
                 {plan.examples.length ? (
                   <div className="planner-examples">
                     {plan.examples.map((example) => (
@@ -157,7 +151,7 @@ export default function EventPlannerPage() {
                         </ul>
                         {example.sources.length > 0 && (
                           <p className="planner-example__sources">
-                            Source{example.sources.length > 1 ? 's' : ''}:{' '}
+                            {example.sources.length > 1 ? copy.sources : copy.source}:{' '}
                             {example.sources.map((source, index) => (
                               <span key={source.url}>
                                 {index > 0 && ', '}
@@ -172,14 +166,14 @@ export default function EventPlannerPage() {
                 ) : (
                   <p className="planner-note">
                     {plan.grounded
-                      ? 'The search did not turn up events close enough to yours to compare. The plan below is still built for your idea.'
-                      : 'We could not confirm real examples with a live search this time, so none are shown. The plan below is still built for your idea.'}
+                      ? copy.noClose
+                      : copy.noConfirmed}
                   </p>
                 )}
               </section>
 
               <section className="planner-block" aria-labelledby="planner-steps">
-                <h3 id="planner-steps">Your plan for Waxhaw</h3>
+                <h3 id="planner-steps">{copy.yourPlan}</h3>
                 <ol className="planner-steps">
                   {plan.steps.map((step) => (
                     <li key={step.title}>
@@ -194,23 +188,23 @@ export default function EventPlannerPage() {
                 <ShieldCheck aria-hidden="true" />
                 <p>
                   {plan.grounded
-                    ? 'These ideas are AI-generated from public web pages.'
-                    : 'These ideas are AI-generated and were not checked against any source this time.'}{' '}
-                  Confirm permits, venues and costs with the{' '}
-                  <a href="https://www.waxhaw.com/" target="_blank" rel="noreferrer">Town of Waxhaw</a> before you book anything.
+                    ? copy.grounded
+                    : copy.ungrounded}{' '}
+                  {copy.confirm}{' '}
+                  <a href="https://www.waxhaw.com/" target="_blank" rel="noreferrer">{copy.town}</a> {copy.confirmEnd}
                 </p>
               </div>
 
               <div className="planner-actions">
                 <button type="button" className="button button--primary" onClick={postFromPlan}>
-                  <CalendarPlus /> Post this event
+                  <CalendarPlus /> {copy.post}
                 </button>
-                <Link className="text-link" to="/events">Back to the calendar <ArrowRight /></Link>
+                <Link className="text-link" to="/events">{copy.back} <ArrowRight /></Link>
               </div>
 
               {plan.sources.length > 0 && (
                 <details className="planner-sources">
-                  <summary>Every page the search used ({plan.sources.length})</summary>
+                  <summary>{copy.everyPage} ({plan.sources.length})</summary>
                   <ul>
                     {plan.sources.map((source) => (
                       <li key={source.url}><a href={source.url} target="_blank" rel="noreferrer">{source.label}<ExternalLink aria-hidden="true" /></a></li>
