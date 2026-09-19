@@ -68,15 +68,25 @@ export function toCommunityEvent(id, data = {}) {
 function deferredSubscription(start) {
   let unsubscribe = null
   let cancelled = false
-  start((teardown) => {
-    if (cancelled) {
-      teardown()
-      return
-    }
-    unsubscribe = teardown
-  })
+  /* Waiting for an idle moment keeps the Firebase download from competing with
+     the first paint. Someone looking for a food pantry sees the directory
+     first; the sign-in state arrives a moment later. The timeout guarantees it
+     still runs on a busy page. */
+  const begin = () => {
+    if (cancelled) return
+    start((teardown) => {
+      if (cancelled) {
+        teardown()
+        return
+      }
+      unsubscribe = teardown
+    })
+  }
+  const idle = typeof requestIdleCallback === 'function' ? requestIdleCallback(begin, { timeout: 2000 }) : setTimeout(begin, 200)
   return () => {
     cancelled = true
+    if (typeof cancelIdleCallback === 'function') cancelIdleCallback(idle)
+    else clearTimeout(idle)
     if (unsubscribe) unsubscribe()
   }
 }

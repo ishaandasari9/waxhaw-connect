@@ -1,8 +1,8 @@
 # Waxhaw Connect progress
 
-Last updated: September 18, 2026
+Last updated: September 18, 2026 (chunk 3)
 Base commit for chunk 1: `eeeab23` (Planner: free-tier search model and fallback)
-Tests: 50 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark, desktop and phone.
+Tests: 51 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark, desktop and phone.
 
 ## Done
 
@@ -45,15 +45,15 @@ Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxha
 | 5 | The paste-a-flyer parser is built but not connected to the post form | S | Done (chunk 1) |
 | 6 | Spanish is only partly translated, and dates are hardcoded to `en-US` | L | Open |
 | 7 | Community posts have no report or moderation option | M | Open |
-| 8 | Fonts load from Google, `oklch()` colors have no fallbacks, and the manifest has no icons | M | Open |
-| 9 | The Firebase bundle (556 kB) loads on every page | S | Open |
+| 8 | Fonts load from Google, `oklch()` colors have no fallbacks, and the manifest has no icons | M | Done (chunk 3) |
+| 9 | The Firebase bundle (556 kB) loads on every page | S | Done (chunk 3) |
 | 10 | Metrics has no targets or measurement (weakest rubric item, about 3/5) | M | Open |
 
 ## Chunk plan (one chunk per session)
 
 1. ~~**Quick fixes:** #1, #3, #4, #5~~ Done Sept 18, along with the planner's source note and a bug where the flyer parser checked event categories against the resource list.
 2. **Moderation:** #7. Adds a report button, hides a post after a few reports, and updates `firestore.rules`.
-3. **Performance and offline:** #8 and #9
+3. ~~**Performance and offline:** #8 and #9~~ Done Sept 18. Fonts are bundled, every color has a hex fallback, the app has real icons, and Firebase waits for an idle moment.
 4. **Metrics:** #10. Adds numeric targets, Core Web Vitals and a measured-vs-planned table on the About page.
 5. **Content:** #2 plus the directory gaps (legal aid, newcomer and language support, volunteering, faith and civic groups, pets)
 6. **Spanish:** #6

@@ -1,5 +1,5 @@
-import { describe, expect, it } from 'vitest'
-import { toCommunityEvent, translateAuthError } from './backend'
+import { describe, expect, it, vi } from 'vitest'
+import { subscribeToAuth, toCommunityEvent, translateAuthError } from './backend'
 
 describe('translateAuthError', () => {
   it('explains a duplicate signup in plain language and suggests the next step', () => {
@@ -68,5 +68,26 @@ describe('toCommunityEvent', () => {
   it('leaves an already serialized timestamp alone', () => {
     expect(toCommunityEvent('doc-5', { ...stored, submittedAt: '2026-09-14T15:04:05.000Z' }).submittedAt)
       .toBe('2026-09-14T15:04:05.000Z')
+  })
+})
+
+describe('deferred backend subscriptions', () => {
+  it('waits for an idle moment, and does nothing if the page moves on first', async () => {
+    vi.useFakeTimers()
+    const onUser = vi.fn()
+    const onUnavailable = vi.fn()
+
+    const stop = subscribeToAuth(onUser, onUnavailable)
+    expect(onUnavailable).not.toHaveBeenCalled()
+    await vi.advanceTimersByTimeAsync(300)
+    /* Without Firebase keys in the test environment, it reports unavailable. */
+    expect(onUnavailable).toHaveBeenCalledTimes(1)
+    stop()
+
+    const laterUnavailable = vi.fn()
+    subscribeToAuth(vi.fn(), laterUnavailable)()
+    await vi.advanceTimersByTimeAsync(300)
+    expect(laterUnavailable).not.toHaveBeenCalled()
+    vi.useRealTimers()
   })
 })

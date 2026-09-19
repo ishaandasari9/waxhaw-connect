@@ -11,6 +11,8 @@
     "geocode": "node scripts/geocode-places.mjs"
   },
   "dependencies": {
+    "@fontsource-variable/newsreader": "^5.3.0",
+    "@fontsource/dm-sans": "^5.3.0",
     "@vitejs/plugin-react": "latest",
     "firebase": "^12.19.0",
     "lucide-react": "latest",
