@@ -1,5 +1,6 @@
 import { describe, expect, it, vi } from 'vitest'
 import { subscribeToAuth, toCommunityEvent, translateAuthError } from './backend'
+import { isBackendConfigured } from './firebase'
 
 describe('translateAuthError', () => {
   it('explains a duplicate signup in plain language and suggests the next step', () => {
@@ -72,21 +73,28 @@ describe('toCommunityEvent', () => {
 })
 
 describe('deferred backend subscriptions', () => {
-  it('waits for an idle moment, and does nothing if the page moves on first', async () => {
+  it('starts nothing until the browser is idle, and cancels cleanly', async () => {
     vi.useFakeTimers()
     const onUser = vi.fn()
     const onUnavailable = vi.fn()
 
     const stop = subscribeToAuth(onUser, onUnavailable)
+    /* The point of the change: nothing runs during the first paint. */
+    expect(onUser).not.toHaveBeenCalled()
     expect(onUnavailable).not.toHaveBeenCalled()
+
     await vi.advanceTimersByTimeAsync(300)
-    /* Without Firebase keys in the test environment, it reports unavailable. */
-    expect(onUnavailable).toHaveBeenCalledTimes(1)
+    /* With no Firebase keys (CI, or a fresh clone) it reports unavailable. With
+       keys present it waits on the real SDK, so only the idle behaviour above
+       is asserted in that case. */
+    if (!isBackendConfigured) expect(onUnavailable).toHaveBeenCalledTimes(1)
     stop()
 
+    const laterUser = vi.fn()
     const laterUnavailable = vi.fn()
-    subscribeToAuth(vi.fn(), laterUnavailable)()
+    subscribeToAuth(laterUser, laterUnavailable)()
     await vi.advanceTimersByTimeAsync(300)
+    expect(laterUser).not.toHaveBeenCalled()
     expect(laterUnavailable).not.toHaveBeenCalled()
     vi.useRealTimers()
   })
