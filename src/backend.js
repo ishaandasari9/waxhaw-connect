@@ -55,6 +55,7 @@ export function toCommunityEvent(id, data = {}) {
     sourceUrl: data.sourceUrl || '',
     organizer: data.organizer || 'A Waxhaw neighbor',
     organizerId: data.organizerId || '',
+    reportedBy: Array.isArray(data.reportedBy) ? data.reportedBy : [],
     communitySubmitted: true,
     submittedAt: data.submittedAt?.toDate?.().toISOString() || data.submittedAt || '',
   }
@@ -226,6 +227,24 @@ export async function publishCommunityEvent(user, input) {
       submittedAt: serverTimestamp(),
     })
     return { ok: true, id: created.id }
+  } catch (error) {
+    return fail(error)
+  }
+}
+
+/**
+ * Records one report against a community listing. The rules only accept a
+ * write that adds the reporter's own id and changes nothing else, so a report
+ * cannot be used to edit or delete someone's event.
+ */
+export async function reportCommunityEvent(user, id) {
+  if (!user) return { ok: false, error: 'Sign in before reporting a listing.' }
+  const services = await getServices()
+  if (!services) return { ok: false, error: OFFLINE_MESSAGE }
+  try {
+    const { arrayUnion, doc, updateDoc } = await import('firebase/firestore')
+    await updateDoc(doc(services.db, COMMUNITY_EVENTS, id), { reportedBy: arrayUnion(user.uid || user.id) })
+    return { ok: true }
   } catch (error) {
     return fail(error)
   }

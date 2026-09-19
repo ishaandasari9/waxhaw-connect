@@ -2,7 +2,7 @@
 
 Last updated: September 18, 2026 (chunk 3)
 Base commit for chunk 1: `eeeab23` (Planner: free-tier search model and fallback)
-Tests: 59 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark, desktop and phone.
+Tests: 66 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark, desktop and phone.
 
 ## Done
 
@@ -44,8 +44,8 @@ Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxha
 | 3 | `.ics` files are missing UID and DTSTAMP, ignore the start time, and don't escape commas | S | Done (chunk 1) |
 | 4 | The post form's minimum date uses UTC, so same-day events are blocked after 8pm Eastern | S | Done (chunk 1) |
 | 5 | The paste-a-flyer parser is built but not connected to the post form | S | Done (chunk 1) |
-| 6 | Spanish is only partly translated, and dates are hardcoded to `en-US` | L | Open |
-| 7 | Community posts have no report or moderation option | M | Open |
+| 6 | Spanish is only partly translated, and dates are hardcoded to `en-US` | L | Done |
+| 7 | Community posts have no report or moderation option | M | Done (chunk 7) |
 | 8 | Fonts load from Google, `oklch()` colors have no fallbacks, and the manifest has no icons | M | Done (chunk 3) |
 | 9 | The Firebase bundle (556 kB) loads on every page | S | Done (chunk 3) |
 | 10 | Metrics has no targets or measurement (weakest rubric item, about 3/5) | M | Done (chunk 4) |
@@ -53,11 +53,11 @@ Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxha
 ## Chunk plan (one chunk per session)
 
 1. ~~**Quick fixes:** #1, #3, #4, #5~~ Done Sept 18, along with the planner's source note and a bug where the flyer parser checked event categories against the resource list.
-2. **Moderation:** #7. Adds a report button, hides a post after a few reports, and updates `firestore.rules`.
+2. ~~**Moderation:** #7~~ Done Sept 18. Residents can report a neighbor-posted listing; three different people hide it from the public calendar.
 3. ~~**Performance and offline:** #8 and #9~~ Done Sept 18. Fonts are bundled, every color has a hex fallback, the app has real icons, and Firebase waits for an idle moment.
 4. ~~**Metrics:** #10~~ Done Sept 18. The About page now computes its own figures, reports test and accessibility results, and measures Core Web Vitals on the reader's device. The one target currently missed is the number of upcoming events, which chunk 5 fixes.
 5. **Content:** #2 plus the directory gaps (legal aid, newcomer and language support, volunteering, faith and civic groups, pets)
-6. **Spanish:** #6
+6. ~~**Spanish:** #6~~ Done Sept 18, with Codex doing the bulk and the urgent, sign-in and About pages finished afterwards.
 7. **Backlog features, if time allows:**
    - A "Report outdated info" button on each resource
    - An "I'm going" RSVP count on events

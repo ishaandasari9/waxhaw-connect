@@ -87,6 +87,7 @@ Firebase web API keys are public by design and appear in the client bundle. Acce
 - Side-by-side comparison for up to three resources
 - English and Spanish discovery content
 - Text-size, high-contrast and reduced-motion controls
+- Community moderation: any signed-in resident can report a neighbor-posted listing, and three different reports hide it from the public calendar while leaving it visible to its author. The security rules accept a report only as an append of the reporter's own id, so reporting cannot edit, delete or silently rewrite someone else's listing, and nobody can report twice
 - Distances by ZIP code or device location on resources, events, the compare tray, the saved plan and the guided finder, with nearest-first sorting, a radius filter and directions links. ZIP centers are bundled (GeoNames, CC BY 4.0) so nothing a resident types leaves the browser, device coordinates are rounded and never stored, and confidential shelter locations never get a point, a distance or a directions link
 - A measured success section on the About page: directory figures computed from the listings themselves, test and accessibility results from the build, and Core Web Vitals measured in the reader's own browser with nothing sent anywhere
 - Self-hosted fonts, hex fallbacks for every oklch color, and a full icon set, so the site renders correctly offline and on older browsers

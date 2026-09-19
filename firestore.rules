@@ -4,7 +4,9 @@ rules_version = '2';
 //
 // Two collections, two very different audiences:
 //   profiles/{uid}        private to the resident it belongs to
-//   communityEvents/{id}  readable by anyone, writable only by its author
+//   communityEvents/{id}  readable by anyone, writable only by its author,
+//                         except that any other signed-in resident may append
+//                         their own id to reportedBy to report the listing
 //
 // Residents browse the calendar without an account, so community events are
 // public read on purpose. Nothing else is.
@@ -38,14 +40,38 @@ service cloud.firestore {
           && data.sourceUrl is string && data.sourceUrl.size() <= 300;
       }
 
+      function reports(data) {
+        return data.get('reportedBy', []);
+      }
+
+      // A report may only append the reporter's own id. Every other field must
+      // be untouched, so this path cannot be used to edit or hide-by-rewrite
+      // someone else's listing, and nobody can report the same event twice.
+      function reportsOwnListing() {
+        return request.resource.data.diff(resource.data).affectedKeys().hasOnly(['reportedBy'])
+          && reports(request.resource.data) is list
+          && reports(request.resource.data).size() == reports(resource.data).size() + 1
+          && reports(request.resource.data).hasAll(reports(resource.data))
+          && request.auth.uid in reports(request.resource.data)
+          && !(request.auth.uid in reports(resource.data))
+          && reports(request.resource.data).size() <= 50
+          && resource.data.organizerId != request.auth.uid;
+      }
+
       allow read: if true;
       allow create: if signedIn()
         && request.resource.data.organizerId == request.auth.uid
+        && reports(request.resource.data).size() == 0
         && validEvent(request.resource.data);
-      allow update: if signedIn()
-        && resource.data.organizerId == request.auth.uid
-        && request.resource.data.organizerId == request.auth.uid
-        && validEvent(request.resource.data);
+      // An author editing their own listing keeps whatever reports it has:
+      // editing is not a way to clear them.
+      allow update: if signedIn() && (
+        (resource.data.organizerId == request.auth.uid
+          && request.resource.data.organizerId == request.auth.uid
+          && reports(request.resource.data) == reports(resource.data)
+          && validEvent(request.resource.data))
+        || reportsOwnListing()
+      );
       allow delete: if signedIn() && resource.data.organizerId == request.auth.uid;
     }
 
