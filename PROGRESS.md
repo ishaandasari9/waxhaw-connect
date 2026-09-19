@@ -1,8 +1,8 @@
 # Waxhaw Connect progress
 
-Last updated: September 16, 2026
-Base commit the patches were built on: `d1de840` (Fix model slug and scope SPA rewrite)
-Tests: 39 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark, desktop and phone.
+Last updated: September 18, 2026
+Base commit for chunk 1: `eeeab23` (Planner: free-tier search model and fallback)
+Tests: 50 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark, desktop and phone.
 
 ## Done
 
@@ -26,10 +26,10 @@ Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxha
 
 ## Your to-dos (no Claude usage needed)
 
-- [ ] Apply the patches and push to `main`
-- [ ] Confirm `GEMINI_API_KEY` is set in Vercel, redeploy, and run one real event plan.
-  - [ ] Check that "What worked elsewhere" shows source links. If it always says no examples could be confirmed, grounding isn't coming back and needs a fix.
-- [ ] Run `npm run geocode` and commit `src/places.js`. This switches distances from "About X mi" to exact figures.
+- [x] Apply the patches and push to `main`
+- [x] Confirm `GEMINI_API_KEY` is set in Vercel, redeploy, and run one real event plan.
+- [ ] **Decide how the planner gets its examples.** Live search returns 429 on a free-tier key, and Google has retired the 2.5 models (which had free search) for new accounts. The planner falls back to a plan with no examples. Either turn on billing in Google AI Studio and set `PLAN_MODEL=gemini-3.5-flash-lite` in Vercel, or switch to a hand-researched list of real events the AI picks from.
+- [x] Run `npm run geocode` and commit `src/places.js`
 - [ ] Fix the library address. The site uses 1515 Cuthbertson Rd, but the library's own page says 1720.
   - [ ] Update both the resource and the library board event in `src/data.js`.
   - [ ] Rerun `npm run geocode`.
@@ -38,11 +38,11 @@ Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxha
 
 | # | Issue | Size | Status |
 |---|---|---|---|
-| 1 | Past events still show on the calendar (the Sept 15 meeting is at the top) | S | Open |
+| 1 | Past events still show on the calendar (the Sept 15 meeting is at the top) | S | Done (chunk 1) |
 | 2 | Only 4 official events | M (research) | Open |
-| 3 | `.ics` files are missing UID and DTSTAMP, ignore the start time, and don't escape commas | S | Open |
-| 4 | The post form's minimum date uses UTC, so same-day events are blocked after 8pm Eastern | S | Open |
-| 5 | The paste-a-flyer parser is built but not connected to the post form | S | Open |
+| 3 | `.ics` files are missing UID and DTSTAMP, ignore the start time, and don't escape commas | S | Done (chunk 1) |
+| 4 | The post form's minimum date uses UTC, so same-day events are blocked after 8pm Eastern | S | Done (chunk 1) |
+| 5 | The paste-a-flyer parser is built but not connected to the post form | S | Done (chunk 1) |
 | 6 | Spanish is only partly translated, and dates are hardcoded to `en-US` | L | Open |
 | 7 | Community posts have no report or moderation option | M | Open |
 | 8 | Fonts load from Google, `oklch()` colors have no fallbacks, and the manifest has no icons | M | Open |
@@ -51,7 +51,7 @@ Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxha
 
 ## Chunk plan (one chunk per session)
 
-1. **Quick fixes:** #1, #3, #4, #5
+1. ~~**Quick fixes:** #1, #3, #4, #5~~ Done Sept 18, along with the planner's source note and a bug where the flyer parser checked event categories against the resource list.
 2. **Moderation:** #7. Adds a report button, hides a post after a few reports, and updates `firestore.rules`.
 3. **Performance and offline:** #8 and #9
 4. **Metrics:** #10. Adds numeric targets, Core Web Vitals and a measured-vs-planned table on the About page.

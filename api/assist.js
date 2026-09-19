@@ -71,7 +71,7 @@ Shape: {"fields":{"title":"","date":"","time":"","location":"","category":"","de
 Rules:
 - "date" must be YYYY-MM-DD, or empty if the text does not state an unambiguous calendar date. Never guess a year and never resolve relative dates like "next Friday".
 - "time" is a plain string as written, or empty.
-- "category" must be one of: ${categoryIds.join(', ')}, or empty.
+- "category" must be one of: ${eventInterests.join(', ')}, or empty.
 - "description" is at most two sentences drawn from the text. Do not invent details.
 - Leave a field empty rather than guessing, and list it in "missing".`
 
@@ -225,7 +225,7 @@ export default async function handler(req, res) {
   if (!result || !result.fields) return res.status(200).json({ ok: false })
 
   const fields = result.fields
-  const category = categoryIds.includes(fields.category) ? fields.category : ''
+  const category = eventInterests.includes(fields.category) ? fields.category : ''
   const date = /^\d{4}-\d{2}-\d{2}$/.test(fields.date || '') ? fields.date : ''
 
   return res.status(200).json({

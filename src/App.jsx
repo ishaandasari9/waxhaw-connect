@@ -9,7 +9,8 @@ import {
   TreePine, UserRound, Users, Utensils, X, Zap,
 } from 'lucide-react'
 import { categories, events, resources, sourceNotes, urgentLinks } from './data'
-import { eventInterests, getRecommendationReason, rankEventsForUser } from './eventUtils'
+import { applyExtractedFields, buildIcs, eventInterests, getRecommendationReason, rankEventsForUser, todayISO, upcomingEvents } from './eventUtils'
+import { extractEventFields } from './assist.js'
 import { SITE_HOME_TITLE, SITE_NAME, SITE_TAGLINE, pageTitle } from './siteConfig'
 import {
   createAccount, isBackendConfigured, loadProfile, publishCommunityEvent, removeCommunityEvent,
@@ -491,7 +492,7 @@ function SavedPreview() {
 function EventsPreview() {
   const { allEvents, t } = useContext(AppContext)
   return (
-    <div className="events-preview"><div className="mini-heading"><h2><CalendarDays /> {t.upcoming}</h2><Link to="/events">View all</Link></div>{[...allEvents].sort((a, b) => a.date.localeCompare(b.date)).slice(0, 3).map((event) => <EventRow key={event.id} event={event} />)}</div>
+    <div className="events-preview"><div className="mini-heading"><h2><CalendarDays /> {t.upcoming}</h2><Link to="/events">View all</Link></div>{upcomingEvents(allEvents).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 3).map((event) => <EventRow key={event.id} event={event} />)}</div>
   )
 }
 
@@ -646,14 +647,14 @@ function EventsPage() {
   useEffect(() => {
     if (params.get('posted') === '1') setToast('Your event is now listed as a community submission.')
   }, [params, setToast])
-  const rankedEvents = feed === 'For you' ? rankEventsForUser(allEvents, currentUser?.interests) : [...allEvents].sort((a, b) => a.date.localeCompare(b.date))
+  const upcoming = useMemo(() => upcomingEvents(allEvents), [allEvents])
+  const rankedEvents = feed === 'For you' ? rankEventsForUser(upcoming, currentUser?.interests) : [...upcoming].sort((a, b) => a.date.localeCompare(b.date))
   const { origin } = useContext(DistanceContext)
   const [nearestFirst, setNearestFirst] = useState(false)
   const categoryFiltered = filter === 'All' ? rankedEvents : rankedEvents.filter((event) => event.category === filter)
   const filtered = arrangeByDistance(categoryFiltered, origin, { sort: nearestFirst })
   const downloadCalendar = (eventItem) => {
-    const date = eventItem.date.replaceAll('-', '')
-    const ics = `BEGIN:VCALENDAR\nVERSION:2.0\nBEGIN:VEVENT\nDTSTART;VALUE=DATE:${date}\nSUMMARY:${eventItem.title}\nLOCATION:${eventItem.location}\nDESCRIPTION:${eventItem.description}\nEND:VEVENT\nEND:VCALENDAR`
+    const ics = buildIcs(eventItem)
     const link = document.createElement('a')
     link.href = URL.createObjectURL(new Blob([ics], { type: 'text/calendar' }))
     link.download = `${eventItem.id}.ics`
@@ -680,7 +681,7 @@ function EventsPage() {
         <div className="distance-bar distance-bar--events"><LocationPicker compact /><DistanceOptions sort={nearestFirst} onSort={setNearestFirst} showWithin={false} defaultLabel={feed === 'For you' ? 'Best match' : 'Soonest first'} /></div>
         <div className="event-controls">
           {currentUser?.personalized && currentUser?.interests?.length > 0 && <div className="feed-tabs" aria-label="Choose event feed">{['For you', 'All events'].map((item) => <button key={item} className={feed === item ? 'is-active' : ''} onClick={() => setFeed(item)} aria-pressed={feed === item}>{item}</button>)}</div>}
-          <div className="filter-pills" aria-label="Filter events">{['All', ...new Set(allEvents.map((event) => event.category))].map((item) => <button key={item} className={filter === item ? 'is-active' : ''} onClick={() => setFilter(item)} aria-pressed={filter === item}>{item}</button>)}</div>
+          <div className="filter-pills" aria-label="Filter events">{['All', ...new Set(upcoming.map((event) => event.category))].map((item) => <button key={item} className={filter === item ? 'is-active' : ''} onClick={() => setFilter(item)} aria-pressed={filter === item}>{item}</button>)}</div>
         </div>
         <div className="event-list">{filtered.map((event) => {
           const date = new Date(`${event.date}T12:00:00`)
@@ -764,10 +765,30 @@ function PostEventPage() {
     if (statePrefill) return statePrefill
     try { return JSON.parse(sessionStorage.getItem(PLAN_DRAFT_KEY) || 'null') } catch { return null }
   })
-  const today = new Date().toISOString().slice(0, 10)
+  const today = todayISO()
   const [form, setForm] = useState({ title: prefill?.title || '', date: '', startTime: '', endTime: '', location: '', category: eventInterests.includes(prefill?.category) ? prefill.category : 'Family', description: prefill?.description || '', accessibility: '', sourceUrl: '' })
   const [error, setError] = useState('')
   const [busy, setBusy] = useState(false)
+  const [paste, setPaste] = useState('')
+  const [reading, setReading] = useState(false)
+  const [readResult, setReadResult] = useState(null)
+
+  /**
+   * Fills the form from a pasted flyer or email. Every field stays editable,
+   * and nothing is posted until the resident submits it themselves.
+   */
+  const fillFromPaste = async () => {
+    if (!paste.trim()) return
+    setReading(true)
+    setReadResult(null)
+    const result = await extractEventFields(paste)
+    setReading(false)
+    if (!result?.fields) return setReadResult({ ok: false })
+    const { form: next, filled, missing } = applyExtractedFields(form, result.fields, today)
+    setForm(next)
+    setReadResult({ ok: true, filled, missing })
+  }
+
   /* Once a signed-in resident has the draft in the form, it has done its job. */
   useEffect(() => {
     if (currentUser) { try { sessionStorage.removeItem(PLAN_DRAFT_KEY) } catch { /* storage can be unavailable */ } }
@@ -785,7 +806,9 @@ function PostEventPage() {
     if (!result.ok) return setError(result.error)
     navigate('/events?posted=1')
   }
-  return <><PageHero eyebrow="Community submission" title="Post an event" intro="Share a gathering, class, meeting or activity with Waxhaw neighbors." compact /><section className="section post-event-layout"><form className="event-form" onSubmit={submit}>{fromPlan && <p className="prefill-note" role="status"><Sparkles /> Started from your event plan. Review the wording, then add the date, time and place.</p>}<div className="form-section"><span>01</span><div><h2>Event basics</h2><p>Use a clear title and choose the closest category.</p><label>Event title<input required maxLength="80" value={form.title} onChange={update('title')} placeholder="Neighborhood garden workshop" /></label><label>Category<select value={form.category} onChange={update('category')}>{eventInterests.map((interest) => <option key={interest}>{interest}</option>)}</select></label><label>Description<textarea required maxLength="400" rows="5" value={form.description} onChange={update('description')} placeholder="What will happen, who is it for, and what should people bring?" /><small>{form.description.length}/400</small></label></div></div><div className="form-section"><span>02</span><div><h2>When and where</h2><div className="form-row"><label>Date<input required min={today} type="date" value={form.date} onChange={update('date')} /></label><label>Starts<input required type="time" value={form.startTime} onChange={update('startTime')} /></label><label>Ends (optional)<input type="time" value={form.endTime} min={form.startTime} onChange={update('endTime')} /></label></div><label>Location<input required maxLength="120" value={form.location} onChange={update('location')} placeholder="Venue name and street address" /></label></div></div><div className="form-section"><span>03</span><div><h2>Help neighbors plan</h2><label>Accessibility details<textarea rows="3" maxLength="220" value={form.accessibility} onChange={update('accessibility')} placeholder="Accessible entrance, parking, seating, interpreters, or who to contact" /></label><label>Event website (optional)<input type="url" value={form.sourceUrl} onChange={update('sourceUrl')} placeholder="https://example.org/event" /></label></div></div><div className="submission-check"><ShieldCheck /><div><strong>Community-submitted listing</strong><p>Your event will be labeled with your profile name and kept separate from verified official listings. You can remove it from the calendar at any time.</p></div></div>{error && <p className="form-error" role="alert"><CircleAlert /> {error}</p>}<div className="form-actions form-actions--end"><Link className="button button--secondary" to="/events">Cancel</Link><button className="button button--primary" disabled={busy}><Send /> {busy ? 'Publishing…' : 'Publish event'}</button></div></form><aside className="posting-guide"><h2>Before you post</h2><ol><li><span>1</span><p><strong>Check the details.</strong> Dates and locations are the organizer’s responsibility.</p></li><li><span>2</span><p><strong>Make it inclusive.</strong> Describe accessibility, cost and who the event welcomes.</p></li><li><span>3</span><p><strong>Keep it local.</strong> Events should serve Waxhaw or nearby Union County residents.</p></li></ol><p className="local-data-note"><Info /> Published events appear on the community calendar for every visitor. You can remove yours at any time.</p></aside></section></>
+  return <><PageHero eyebrow="Community submission" title="Post an event" intro="Share a gathering, class, meeting or activity with Waxhaw neighbors." compact /><section className="section post-event-layout"><form className="event-form" onSubmit={submit}><div className="flyer-paste"><h2>Have a flyer or an email about it?</h2><p>Paste the text and we will fill in what we can find. Check every field afterwards, and nothing posts until you submit.</p><textarea rows="3" maxLength={2000} value={paste} onChange={(event) => setPaste(event.target.value)} placeholder="Paste the flyer text, a newsletter blurb or an email here" aria-label="Paste flyer or email text" /><div className="flyer-paste__actions"><button type="button" className="button button--secondary" onClick={fillFromPaste} disabled={reading || !paste.trim()}><Sparkles /> {reading ? 'Reading' : 'Fill the form'}</button>{paste && <button type="button" className="text-button" onClick={() => { setPaste(''); setReadResult(null) }}>Clear</button>}</div>{readResult && (readResult.ok
+  ? <p className="flyer-paste__result" role="status">{readResult.filled.length ? `Filled in ${readResult.filled.join(', ')}.` : 'Nothing could be filled in from that text.'}{readResult.missing.length ? ` Still needed: ${readResult.missing.join(', ')}.` : ''}</p>
+  : <p className="flyer-paste__result flyer-paste__result--error" role="alert">That text could not be read. Fill the form in yourself, or try pasting a shorter section.</p>)}</div>{fromPlan && <p className="prefill-note" role="status"><Sparkles /> Started from your event plan. Review the wording, then add the date, time and place.</p>}<div className="form-section"><span>01</span><div><h2>Event basics</h2><p>Use a clear title and choose the closest category.</p><label>Event title<input required maxLength="80" value={form.title} onChange={update('title')} placeholder="Neighborhood garden workshop" /></label><label>Category<select value={form.category} onChange={update('category')}>{eventInterests.map((interest) => <option key={interest}>{interest}</option>)}</select></label><label>Description<textarea required maxLength="400" rows="5" value={form.description} onChange={update('description')} placeholder="What will happen, who is it for, and what should people bring?" /><small>{form.description.length}/400</small></label></div></div><div className="form-section"><span>02</span><div><h2>When and where</h2><div className="form-row"><label>Date<input required min={today} type="date" value={form.date} onChange={update('date')} /></label><label>Starts<input required type="time" value={form.startTime} onChange={update('startTime')} /></label><label>Ends (optional)<input type="time" value={form.endTime} min={form.startTime} onChange={update('endTime')} /></label></div><label>Location<input required maxLength="120" value={form.location} onChange={update('location')} placeholder="Venue name and street address" /></label></div></div><div className="form-section"><span>03</span><div><h2>Help neighbors plan</h2><label>Accessibility details<textarea rows="3" maxLength="220" value={form.accessibility} onChange={update('accessibility')} placeholder="Accessible entrance, parking, seating, interpreters, or who to contact" /></label><label>Event website (optional)<input type="url" value={form.sourceUrl} onChange={update('sourceUrl')} placeholder="https://example.org/event" /></label></div></div><div className="submission-check"><ShieldCheck /><div><strong>Community-submitted listing</strong><p>Your event will be labeled with your profile name and kept separate from verified official listings. You can remove it from the calendar at any time.</p></div></div>{error && <p className="form-error" role="alert"><CircleAlert /> {error}</p>}<div className="form-actions form-actions--end"><Link className="button button--secondary" to="/events">Cancel</Link><button className="button button--primary" disabled={busy}><Send /> {busy ? 'Publishing…' : 'Publish event'}</button></div></form><aside className="posting-guide"><h2>Before you post</h2><ol><li><span>1</span><p><strong>Check the details.</strong> Dates and locations are the organizer’s responsibility.</p></li><li><span>2</span><p><strong>Make it inclusive.</strong> Describe accessibility, cost and who the event welcomes.</p></li><li><span>3</span><p><strong>Keep it local.</strong> Events should serve Waxhaw or nearby Union County residents.</p></li></ol><p className="local-data-note"><Info /> Published events appear on the community calendar for every visitor. You can remove yours at any time.</p></aside></section></>
 }
 
 function SavedPage() {

@@ -193,7 +193,10 @@ export default function EventPlannerPage() {
               <div className="planner-check">
                 <ShieldCheck aria-hidden="true" />
                 <p>
-                  These ideas are AI-generated from public web pages. Confirm permits, venues and costs with the{' '}
+                  {plan.grounded
+                    ? 'These ideas are AI-generated from public web pages.'
+                    : 'These ideas are AI-generated and were not checked against any source this time.'}{' '}
+                  Confirm permits, venues and costs with the{' '}
                   <a href="https://www.waxhaw.com/" target="_blank" rel="noreferrer">Town of Waxhaw</a> before you book anything.
                 </p>
               </div>

@@ -871,6 +871,16 @@ html[data-motion='reduced'] *, html[data-motion='reduced'] *::before, html[data-
   .resource-card, .action-plan li { break-inside: avoid; }
 }
 
+.flyer-paste { display: grid; gap: .6rem; margin-bottom: 1.5rem; padding: 1.1rem 1.2rem; background: var(--paper-deep); border: 1px dashed var(--border-strong); border-radius: var(--radius-md); }
+.flyer-paste h2 { margin: 0; font-size: 1.15rem; }
+.flyer-paste p { margin: 0; font-size: .82rem; color: var(--ink-soft); }
+.flyer-paste textarea { width: 100%; padding: .7rem .8rem; border: 1px solid var(--border-strong); border-radius: var(--radius-sm); background: var(--surface); color: var(--ink); font: inherit; resize: vertical; }
+.flyer-paste ::placeholder { color: var(--placeholder); opacity: 1; }
+.flyer-paste__actions { display: flex; flex-wrap: wrap; align-items: center; gap: .6rem; }
+.flyer-paste__actions .button svg { width: 1.05rem; height: 1.05rem; }
+.flyer-paste__result { font-size: .82rem; font-weight: 700; color: var(--forest-dark); }
+.flyer-paste__result--error { color: var(--danger); }
+
 /* Distance */
 .distance-tag, .resource-meta .distance-tag, .event-facts .distance-tag, .detail-facts .distance-tag { width: max-content; display: inline-flex; align-items: center; gap: .3rem; padding: .15rem .5rem; border-radius: 999px; background: var(--forest-light); color: var(--forest-dark); font-size: .74rem; font-weight: 700; line-height: 1.4; }
 .distance-tag svg, .resource-meta .distance-tag svg, .event-facts .distance-tag svg { width: .8rem; height: .8rem; margin: 0; color: currentColor; }
