@@ -29,6 +29,11 @@ export const GEOCODED = {
     "lng": -80.550457,
     "matched": "407 N MAIN ST, MONROE, NC, 28112"
   },
+  "4218 Waxhaw-Marvin Road, Waxhaw, NC 28173": {
+    "lat": 34.946431,
+    "lng": -80.773429,
+    "matched": "4218 WAXHAW-MARVIN RD, WAXHAW, NC, 28173"
+  },
   "8607 Kensington Drive, Waxhaw, NC 28173": {
     "lat": 34.946798,
     "lng": -80.773555,
