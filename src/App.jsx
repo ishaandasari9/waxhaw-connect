@@ -17,7 +17,8 @@ import PageHero from './PageHero.jsx'
 import MetricsPanel from './Metrics.jsx'
 import { DirectionsLink, DistanceOptions, DistanceTag, LocationPicker } from './DistanceControls.jsx'
 import { DistanceContext, useDistanceState } from './distanceContext.js'
-import { arrangeByDistance, describeDistance, placeFor } from './distance.js'
+import { WAXHAW_CENTER, arrangeByDistance, describeDistance, milesBetween, placeFor } from './distance.js'
+import { QUALITY_STATS } from './qualityStats.js'
 
 const AppContext = createContext(null)
 
@@ -49,6 +50,65 @@ const copy = {
     eventPlanner: { eyebrow: 'Event planner', title: 'Plan an event people will show up for', intro: 'Describe what you have in mind. We show you events from nearby counties that worked, why they worked, and turn that into a plan for Waxhaw.', kind: 'What kind of event do you want to host?', ideaPlaceholder: 'A Saturday morning makers market with local food trucks and live music', audience: 'Who is it for?', optional: '(optional)', audiencePlaceholder: 'Families with young kids', size: 'Expected size', unsure: 'Not sure yet', budget: 'Budget', season: 'Season', success: 'What would make it a success?', successPlaceholder: 'Neighbors meet each other and local vendors make sales', looking: 'Looking up similar events', build: 'Build my plan', startOver: 'Start over', hint: "Takes about 15 seconds. Don't include names, phone numbers or addresses.", how: 'How the planner works', describeTitle: 'Describe your event.', describe: 'A sentence is enough. Size and budget sharpen the advice.', elsewhereTitle: 'See what worked elsewhere.', elsewhere: 'A live search finds similar events in other towns, with links to where each detail came from.', waxhawTitle: 'Get a plan for Waxhaw.', waxhaw: 'Steps in order, then one click to start your calendar listing.', searching: 'Searching for similar events and reading what made them work.', planHeading: 'Your event plan', worked: 'What worked elsewhere', source: 'Source', sources: 'Sources', noClose: 'None of our researched examples are close enough to yours to compare fairly. The plan below is still built for your idea.', verified: 'Each example below was researched and checked by our team, and links to where we found it.', noConfirmed: 'We could not confirm real examples with a live search this time, so none are shown. The plan below is still built for your idea.', yourPlan: 'Your plan for Waxhaw', grounded: 'The examples are researched by our team; the steps are AI-written from them.', ungrounded: 'These ideas are AI-generated and were not checked against any source this time.', confirm: 'Confirm permits, venues and costs with the', town: 'Town of Waxhaw', confirmEnd: 'before you book anything.', post: 'Post this event', back: 'Back to the calendar', everyPage: 'Every page the search used', sizes: { 'Under 25 people': 'Under 25 people', '25 to 100 people': '25 to 100 people', '100 to 500 people': '100 to 500 people', 'More than 500 people': 'More than 500 people' }, budgets: { 'Free or almost free': 'Free or almost free', 'Under $500': 'Under $500', '$500 to $5,000': '$500 to $5,000', 'More than $5,000': 'More than $5,000' }, seasons: { 'Not sure yet': 'Not sure yet', Spring: 'Spring', Summer: 'Summer', Fall: 'Fall', Winter: 'Winter' }, failures: { limit: 'You have made several plans in the last hour. Wait a little while, then try again.', offline: 'The planner needs an internet connection to look up other events. Reconnect and try again.', error: 'The planner could not build a plan this time. Try again, or describe your event in a different way.' } },
     popularSearches: ['Food assistance', 'Housing help', 'Mental health', 'After-school programs', 'Senior services'],
     trust: { title: 'Built on verified local information', body: 'Sources are clearly labeled, and every listing shows when it was checked.', link: 'See our sources' },
+    home: {
+      h1: { lead: 'One front door for', accent: 'every kind', end: 'of local help.' },
+      reassure: 'Free for everyone. No account needed. Every listing shows its source.',
+      livePanel: { badge: 'Live from the directory', alsoNearby: 'Also in the directory', checked: 'Checked', source: 'Source' },
+      gap: {
+        eyebrow: 'The gap this site closes',
+        items: [
+          ['Help is scattered', 'Hours, eligibility and phone numbers live on dozens of separate websites, flyers and voicemail menus.'],
+          ['Search results mislead', 'Looking up “food help near me” surfaces ads and stale pages before a real local pantry.'],
+          ['Listings go stale', 'A directory nobody re-checks quietly turns into a list of wrong numbers.'],
+          ['Cost keeps people out', 'Everything here is free, with no ads and no account, in English and Spanish.'],
+        ],
+      },
+      showcase: {
+        eyebrow: 'What you can do here',
+        title: 'Look it up. Check it. Act on it.',
+        intro: 'Three things happen every time you open this site — and none of them ask for an account.',
+        features: [
+          { kicker: 'The directory', title: 'Trust you can trace.', body: 'Every listing links to the organization that published it and shows the date a person last checked it — so you never act on stale hours or a dead phone number.', cta: 'Browse all listings' },
+          { kicker: 'The guided finder', title: 'Say it in your own words.', body: 'Three plain-language questions, no forms and nothing stored — then a short list of trusted places to start.', cta: 'Start the finder' },
+          { kicker: 'The calendar', title: 'Show up for what matters.', body: 'Official events and neighbor-posted gatherings share one feed with clear labels, plus picks that match interests you choose.', cta: 'See the calendar' },
+        ],
+        mockQuestion: 'Question 1 of 3',
+        mockPick: 'Picked for you',
+      },
+      explorer: {
+        eyebrow: 'Try it yourself',
+        title: 'How much help is within reach?',
+        intro: 'Drag the radius and watch the directory answer. Distances start from downtown Waxhaw — or from your own ZIP code once you set one.',
+        slider: 'Search radius',
+        milesValue: '{miles} miles',
+        countLabel: 'places to go within {miles} miles of {origin}',
+        downtown: 'downtown Waxhaw',
+        yourLocation: 'your location',
+        zipLabel: 'ZIP {zip}',
+        always: '{count} more services help at any distance, by phone or countywide.',
+        nearest: 'Closest right now',
+        noneWithin: 'Nothing this close yet — widen the radius.',
+        seeAll: 'See every listing with distances',
+        live: 'Live count',
+      },
+      steps: {
+        eyebrow: 'How it works',
+        title: 'From “where do I start?” to a real next step.',
+        items: [
+          ['Say what is going on', 'Type a need, or describe your situation in plain words — English or Spanish.', 'No account needed'],
+          ['Compare what is close', 'See distance, hours and cost side by side, from your ZIP code or device location.', 'Location stays on your device'],
+          ['Check the source', 'Open the original page every detail came from before you call.', 'Every listing is sourced'],
+          ['Save your plan', 'Keep next steps in a printable list that lives in this browser.', 'Ready when you are'],
+        ],
+      },
+      stats: {
+        eyebrow: 'Kept honest by design',
+        sourced: 'listings, each linked to its original source',
+        events: 'upcoming events on one calendar',
+        tests: 'automated checks before every change',
+        numbersLink: 'See the current numbers',
+      },
+    },
     pageTitles: {
       '/': '', '/resources': 'Resource directory', '/finder': 'Guided resource finder', '/events': 'Community events',
       '/events/new': 'Post a community event', '/events/plan': 'Event planner', '/login': 'Sign in',
@@ -145,6 +205,65 @@ const copy = {
     eventPlanner: { eyebrow: 'Planificador de eventos', title: 'Planifique un evento al que la gente quiera asistir', intro: 'Describa lo que tiene en mente. Le mostramos eventos de condados cercanos que funcionaron, por qué funcionaron y ciudades, mostramos por qué funcionaron y convertimos esa información en un plan para Waxhaw.', kind: '¿Qué tipo de evento quiere organizar?', ideaPlaceholder: 'Un mercado de creadores el sábado por la mañana con camiones de comida local y música en vivo', audience: '¿Para quién es?', optional: '(opcional)', audiencePlaceholder: 'Familias con niños pequeños', size: 'Tamaño esperado', unsure: 'Aún no lo sé', budget: 'Presupuesto', season: 'Temporada', success: '¿Qué haría que fuera un éxito?', successPlaceholder: 'Los vecinos se conocen y los vendedores locales logran ventas', looking: 'Buscando eventos similares', build: 'Crear mi plan', startOver: 'Comenzar de nuevo', hint: 'Tarda unos 15 segundos. No incluya nombres, números de teléfono ni direcciones.', how: 'Cómo funciona el planificador', describeTitle: 'Describa su evento.', describe: 'Una oración es suficiente. El tamaño y el presupuesto mejoran las recomendaciones.', elsewhereTitle: 'Vea qué funcionó en otros lugares.', elsewhere: 'Una búsqueda en vivo encuentra eventos similares en otras ciudades, con enlaces a la fuente de cada detalle.', waxhawTitle: 'Obtenga un plan para Waxhaw.', waxhaw: 'Pasos en orden y luego un clic para comenzar su anuncio en el calendario.', searching: 'Buscando eventos similares y analizando qué los hizo funcionar.', planHeading: 'Su plan de evento', worked: 'Lo que funcionó en otros lugares', source: 'Fuente', sources: 'Fuentes', noClose: 'Ninguno de nuestros ejemplos investigados se parece lo suficiente al suyo para compararlo bien. El plan de abajo sigue hecho para su idea.', verified: 'Cada ejemplo de abajo fue investigado y verificado por nuestro equipo, y enlaza a la fuente donde lo encontramos.', noConfirmed: 'Esta vez no pudimos confirmar ejemplos reales con una búsqueda en vivo, así que no se muestra ninguno. El plan de abajo sigue adaptado a su idea.', yourPlan: 'Su plan para Waxhaw', grounded: 'Los ejemplos fueron investigados por nuestro equipo; los pasos los redactó la IA a partir de ellos.', ungrounded: 'Estas ideas fueron generadas por IA y esta vez no se comprobaron con ninguna fuente.', confirm: 'Confirme los permisos, lugares y costos con el', town: 'Town of Waxhaw', confirmEnd: 'antes de reservar.', post: 'Publicar este evento', back: 'Volver al calendario', everyPage: 'Todas las páginas utilizadas en la búsqueda', sizes: { 'Under 25 people': 'Menos de 25 personas', '25 to 100 people': 'De 25 a 100 personas', '100 to 500 people': 'De 100 a 500 personas', 'More than 500 people': 'Más de 500 personas' }, budgets: { 'Free or almost free': 'Gratis o casi gratis', 'Under $500': 'Menos de $500', '$500 to $5,000': 'De $500 a $5,000', 'More than $5,000': 'Más de $5,000' }, seasons: { 'Not sure yet': 'Aún no lo sé', Spring: 'Primavera', Summer: 'Verano', Fall: 'Otoño', Winter: 'Invierno' }, failures: { limit: 'Ha creado varios planes durante la última hora. Espere un poco y vuelva a intentarlo.', offline: 'El planificador necesita conexión a internet para buscar otros eventos. Vuelva a conectarse e inténtelo de nuevo.', error: 'El planificador no pudo crear un plan esta vez. Inténtelo de nuevo o describa su evento de otra manera.' } },
     popularSearches: ['Ayuda con comida', 'Ayuda con vivienda', 'Salud mental', 'Programas después de clases', 'Servicios para adultos mayores'],
     trust: { title: 'Basado en información local verificada', body: 'Las fuentes están claramente indicadas y cada ficha muestra cuándo se revisó.', link: 'Ver nuestras fuentes' },
+    home: {
+      h1: { lead: 'Una sola puerta para', accent: 'todo tipo', end: 'de ayuda local.' },
+      reassure: 'Gratis para todos. Sin cuenta. Cada ficha muestra su fuente.',
+      livePanel: { badge: 'En vivo desde el directorio', alsoNearby: 'También en el directorio', checked: 'Revisado', source: 'Fuente' },
+      gap: {
+        eyebrow: 'La brecha que cierra este sitio',
+        items: [
+          ['La ayuda está dispersa', 'Los horarios, requisitos y teléfonos viven en docenas de sitios web, volantes y menús telefónicos separados.'],
+          ['Las búsquedas confunden', 'Buscar “ayuda con comida cerca de mí” muestra anuncios y páginas desactualizadas antes que una despensa real.'],
+          ['Las fichas envejecen', 'Un directorio que nadie vuelve a revisar se convierte en una lista de números equivocados.'],
+          ['El costo excluye', 'Todo aquí es gratis, sin anuncios y sin cuenta, en inglés y español.'],
+        ],
+      },
+      showcase: {
+        eyebrow: 'Qué puede hacer aquí',
+        title: 'Búsquelo. Verifíquelo. Actúe.',
+        intro: 'Tres cosas suceden cada vez que abre este sitio, y ninguna le pide una cuenta.',
+        features: [
+          { kicker: 'El directorio', title: 'Confianza que se puede rastrear.', body: 'Cada ficha enlaza a la organización que la publicó y muestra la fecha en que una persona la revisó por última vez, para que nunca actúe con horarios vencidos o un teléfono fuera de servicio.', cta: 'Ver todas las fichas' },
+          { kicker: 'La guía personalizada', title: 'Dígalo con sus propias palabras.', body: 'Tres preguntas en lenguaje sencillo, sin formularios y sin guardar nada; después, una lista corta de lugares confiables para comenzar.', cta: 'Comenzar la guía' },
+          { kicker: 'El calendario', title: 'Participe en lo que importa.', body: 'Los eventos oficiales y los publicados por vecinos comparten un solo calendario con etiquetas claras, además de selecciones según los intereses que usted elija.', cta: 'Ver el calendario' },
+        ],
+        mockQuestion: 'Pregunta 1 de 3',
+        mockPick: 'Seleccionado para usted',
+      },
+      explorer: {
+        eyebrow: 'Pruébelo usted mismo',
+        title: '¿Cuánta ayuda tiene al alcance?',
+        intro: 'Mueva el radio y vea cómo responde el directorio. Las distancias parten del centro de Waxhaw, o de su propio código postal cuando lo indique.',
+        slider: 'Radio de búsqueda',
+        milesValue: '{miles} millas',
+        countLabel: 'lugares para visitar a menos de {miles} millas de {origin}',
+        downtown: 'el centro de Waxhaw',
+        yourLocation: 'su ubicación',
+        zipLabel: 'código postal {zip}',
+        always: '{count} servicios más ayudan a cualquier distancia, por teléfono o en todo el condado.',
+        nearest: 'Lo más cercano ahora',
+        noneWithin: 'Nada tan cerca todavía; amplíe el radio.',
+        seeAll: 'Ver cada ficha con distancias',
+        live: 'Conteo en vivo',
+      },
+      steps: {
+        eyebrow: 'Cómo funciona',
+        title: 'De “¿por dónde empiezo?” a un próximo paso real.',
+        items: [
+          ['Cuente qué sucede', 'Escriba una necesidad o describa su situación con palabras sencillas, en inglés o español.', 'Sin cuenta'],
+          ['Compare lo cercano', 'Vea distancia, horario y costo lado a lado, desde su código postal o la ubicación de su dispositivo.', 'Su ubicación queda en su dispositivo'],
+          ['Verifique la fuente', 'Abra la página original de donde salió cada detalle antes de llamar.', 'Cada ficha tiene fuente'],
+          ['Guarde su plan', 'Mantenga los próximos pasos en una lista imprimible que vive en este navegador.', 'Lista cuando usted lo esté'],
+        ],
+      },
+      stats: {
+        eyebrow: 'Honesto por diseño',
+        sourced: 'fichas, cada una enlazada a su fuente original',
+        events: 'eventos próximos en un solo calendario',
+        tests: 'pruebas automáticas antes de cada cambio',
+        numbersLink: 'Ver las cifras actuales',
+      },
+    },
     pageTitles: {
       '/': '', '/resources': 'Directorio de recursos', '/finder': 'Guía personalizada', '/events': 'Eventos comunitarios',
       '/events/new': 'Publicar un evento', '/events/plan': 'Planificador de eventos', '/login': 'Iniciar sesión',
@@ -538,23 +657,236 @@ function Header() {
   )
 }
 
-function Townscape() {
+function HeroLivePanel() {
+  const { language, t } = useContext(AppContext)
+  const featured = resources.find((item) => item.featured) || resources[0]
+  const others = resources.filter((item) => item.id !== featured.id).slice(0, 2)
+  const labels = t.home.livePanel
   return (
-    <svg className="townscape" viewBox="0 0 1440 330" role="img" aria-label="An illustrated Waxhaw townscape with trees, paths, neighbors, a water tower and downtown buildings">
-      <defs>
-        <pattern id="dots" width="12" height="12" patternUnits="userSpaceOnUse"><circle cx="2" cy="2" r="1" fill="currentColor" opacity=".12" /></pattern>
-      </defs>
-      <path className="sky-wash" d="M0 40C230 85 315 5 500 50s340 30 510 0 282-4 430 36v244H0z" />
-      <path className="land" d="M0 260c180-40 330 20 500-10 190-35 320-10 475 18 170 31 310-12 465-38v100H0z" />
-      <path className="path" d="M560 330c105-66 150-109 244-124 82-13 145 5 232 39" />
-      <g className="trees">
-        {[70, 145, 1210, 1300, 1370].map((x, i) => <g key={x} transform={`translate(${x} ${220 - (i % 2) * 18})`}><path d="M0 80V25" /><circle cy="12" r="34" /><circle cx="-24" cy="30" r="25" /><circle cx="24" cy="32" r="28" /></g>)}
-      </g>
-      <g className="water-tower" transform="translate(1088 105)"><ellipse cx="42" cy="18" rx="38" ry="13" /><path d="M5 20h74l-9 62H15z" /><path d="M22 82 8 163M61 82l15 81M17 115h49M12 145h60" /><text x="42" y="56" textAnchor="middle">WAXHAW</text></g>
-      <g className="buildings" transform="translate(1175 184)"><path d="M0 34h76v108H0zM78 0h92v142H78zM172 25h70v117h-70z" /><path d="M12 56h15v25H12zm28 0h15v25H40zm56-28h18v30H96zm32 0h18v30h-18zm62 20h14v24h-14zm25 0h14v24h-14z" /></g>
-      <g className="people" transform="translate(220 246)"><circle cx="0" cy="0" r="8" /><path d="M0 8v32m0-18-15 12m15-12 16 9m-16 9-12 26m12-26 14 26" /><circle cx="80" cy="8" r="7" /><path d="M80 15v28m0-17-11 10m11-10 12 7m-12 10-9 22m9-22 11 22" /></g>
-      <rect className="texture" width="1440" height="330" fill="url(#dots)" />
-    </svg>
+    <aside className="hero-panel" aria-label={labels.badge}>
+      <div className="hero-panel__head">
+        <span className="live-dot" aria-hidden="true" />
+        <strong>{labels.badge}</strong>
+        <SourceBadge />
+      </div>
+      <div className="hero-panel__feature">
+        <span className="hero-panel__category">{categories.find((item) => item.id === featured.category)?.[language === 'es' ? 'labelEs' : 'label']}</span>
+        <h2>{featured.name}</h2>
+        <p>{language === 'es' ? featured.descriptionEs : featured.description}</p>
+        <div className="hero-panel__meta">
+          <span><MapPin size={14} /> {featured.location}</span>
+          <span><Clock3 size={14} /> {featured.hours}</span>
+        </div>
+        <div className="hero-panel__provenance">
+          <span><BadgeCheck size={14} /> {labels.checked} {formatVerificationDate(featured.verified, language)}</span>
+          <span><ExternalLink size={13} /> {labels.source}: {featured.source}</span>
+        </div>
+      </div>
+      <div className="hero-panel__more">
+        <small>{labels.alsoNearby}</small>
+        {others.map((item) => (
+          <Link key={item.id} to={`/resources/${item.id}`}>
+            <strong>{item.name}</strong>
+            <span>{categories.find((cat) => cat.id === item.category)?.[language === 'es' ? 'labelEs' : 'label']}</span>
+            <ArrowRight size={15} aria-hidden="true" />
+          </Link>
+        ))}
+      </div>
+    </aside>
+  )
+}
+
+function GapRow() {
+  const { t } = useContext(AppContext)
+  const icons = [Globe2, Search, Clock3, HandHeart]
+  return (
+    <section className="gap-row" aria-label={t.home.gap.eyebrow}>
+      <div className="section">
+        <span className="eyebrow gap-row__eyebrow">{t.home.gap.eyebrow}</span>
+        <div className="gap-row__grid">
+          {t.home.gap.items.map(([title, body], index) => {
+            const Icon = icons[index]
+            return <div key={title}><span className="gap-row__icon"><Icon size={19} /></span><h3>{title}</h3><p>{body}</p></div>
+          })}
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function MockDirectoryCard() {
+  const { language, t } = useContext(AppContext)
+  const resource = resources.find((item) => item.id === 'common-heart') || resources[0]
+  return (
+    <div className="mock-card" aria-hidden="true">
+      <div className="mock-card__head"><span className="category-symbol category-symbol--basic-needs"><Utensils /></span><SourceBadge /></div>
+      <strong className="mock-card__title">{resource.name}</strong>
+      <p>{language === 'es' ? resource.descriptionEs : resource.description}</p>
+      <div className="mock-card__rows">
+        <span><MapPin size={14} /> {resource.location}</span>
+        <span><Clock3 size={14} /> {resource.hours}</span>
+        <span className="mock-card__provenance"><BadgeCheck size={14} /> {t.home.livePanel.checked} {formatVerificationDate(resource.verified, language)} · {resource.source}</span>
+      </div>
+    </div>
+  )
+}
+
+function MockFinderCard() {
+  const { language, t } = useContext(AppContext)
+  const options = ['basic-needs', 'transportation', 'health']
+  return (
+    <div className="mock-card mock-card--finder" aria-hidden="true">
+      <small>{t.home.showcase.mockQuestion}</small>
+      <strong className="mock-card__title">{t.finderPage.questions[0].title}</strong>
+      <div className="mock-choices">
+        {options.map((id, index) => {
+          const category = categories.find((item) => item.id === id)
+          return <span key={id} className={index === 0 ? 'mock-choice is-picked' : 'mock-choice'}><i>{String.fromCharCode(65 + index)}</i>{category?.[language === 'es' ? 'labelEs' : 'label']}{index === 0 && <Check size={15} />}</span>
+        })}
+      </div>
+    </div>
+  )
+}
+
+function MockEventsFeed() {
+  const { allEvents, t } = useContext(AppContext)
+  const upcoming = upcomingEvents(allEvents).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 3)
+  return (
+    <div className="mock-card mock-card--events">
+      <div className="mock-card__head"><strong className="mock-card__feed-title"><CalendarDays size={16} /> {t.upcoming}</strong><span className="pick-chip"><Sparkles size={12} /> {t.home.showcase.mockPick}</span></div>
+      {upcoming.map((event) => <EventRow key={event.id} event={event} />)}
+    </div>
+  )
+}
+
+function Showcase() {
+  const { t } = useContext(AppContext)
+  const copy = t.home.showcase
+  const mocks = [<MockDirectoryCard key="directory" />, <MockFinderCard key="finder" />, <MockEventsFeed key="events" />]
+  const links = ['/resources', '/finder', '/events']
+  return (
+    <section className="showcase section" aria-label={copy.title}>
+      <div className="showcase__heading">
+        <span className="eyebrow">{copy.eyebrow}</span>
+        <h2>{copy.title}</h2>
+        <p>{copy.intro}</p>
+      </div>
+      {copy.features.map((feature, index) => (
+        <div key={feature.kicker} className={index % 2 ? 'showcase__row showcase__row--flip' : 'showcase__row'}>
+          <div className="showcase__copy">
+            <span className="showcase__kicker">{feature.kicker}</span>
+            <h3>{feature.title}</h3>
+            <p>{feature.body}</p>
+            <Link className="text-link" to={links[index]}>{feature.cta}<ArrowRight size={16} /></Link>
+          </div>
+          <div className="showcase__mock">{mocks[index]}</div>
+        </div>
+      ))}
+    </section>
+  )
+}
+
+function RadiusExplorer() {
+  const { language, t } = useContext(AppContext)
+  const { origin } = useContext(DistanceContext)
+  const [radius, setRadius] = useState(5)
+  const copy = t.home.explorer
+  const center = origin || { ...WAXHAW_CENTER, source: 'zip' }
+  const located = useMemo(() => resources
+    .map((resource) => ({ resource, place: placeFor(resource) }))
+    .filter((entry) => entry.place)
+    .map((entry) => ({ ...entry, miles: milesBetween(center, entry.place) }))
+    .sort((a, b) => a.miles - b.miles), [center])
+  const within = located.filter((entry) => entry.miles <= radius)
+  const alwaysAvailable = resources.length - located.length
+  const originLabel = !origin ? copy.downtown : origin.source === 'device' ? copy.yourLocation : copy.zipLabel.replace('{zip}', origin.zip)
+  const milesText = copy.milesValue.replace('{miles}', radius)
+  return (
+    <section className="explorer" aria-labelledby="explorer-title">
+      <div className="section">
+        <span className="eyebrow explorer__eyebrow"><Zap size={14} /> {copy.eyebrow}</span>
+        <h2 id="explorer-title">{copy.title}</h2>
+        <p className="explorer__intro">{copy.intro}</p>
+        <div className="explorer__panels">
+          <div className="explorer__panel">
+            <div className="explorer__panel-head"><span className="live-dot" aria-hidden="true" /><small>{copy.live}</small></div>
+            <p className="explorer__count" aria-live="polite">
+              <strong>{within.length}</strong>
+              <span>{copy.countLabel.replace('{miles}', radius).replace('{origin}', originLabel)}</span>
+            </p>
+            <div className="explorer__dots" aria-hidden="true">
+              {located.map((entry) => <i key={entry.resource.id} className={entry.miles <= radius ? 'is-in' : ''} />)}
+            </div>
+            <label className="explorer__slider">
+              {copy.slider}
+              <input type="range" min="1" max="25" step="1" value={radius} onChange={(e) => setRadius(Number(e.target.value))} aria-valuetext={milesText} />
+              <output>{milesText}</output>
+            </label>
+            <p className="explorer__always">{copy.always.replace('{count}', alwaysAvailable)}</p>
+          </div>
+          <div className="explorer__panel explorer__panel--list">
+            <small className="explorer__list-title">{copy.nearest}</small>
+            {within.length === 0 && <p className="explorer__empty">{copy.noneWithin}</p>}
+            {within.slice(0, 3).map(({ resource, miles }) => (
+              <Link key={resource.id} to={`/resources/${resource.id}`}>
+                <strong>{resource.name}</strong>
+                <span>{categories.find((cat) => cat.id === resource.category)?.[language === 'es' ? 'labelEs' : 'label']} · {miles < 1 ? '< 1 mi' : `~${Math.round(miles)} mi`}</span>
+              </Link>
+            ))}
+            <Link className="button button--primary explorer__cta" to="/resources">{copy.seeAll} <ArrowRight size={16} /></Link>
+          </div>
+        </div>
+        <div className="explorer__picker">
+          <div><span className="eyebrow explorer__eyebrow">{t.homeLocation.eyebrow}</span><h3>{t.homeLocation.title}</h3><p>{t.homeLocation.intro}</p></div>
+          <LocationPicker compact labels={t.distance} />
+        </div>
+      </div>
+    </section>
+  )
+}
+
+function StepFlow() {
+  const { t } = useContext(AppContext)
+  const copy = t.home.steps
+  return (
+    <section className="step-flow section" aria-label={copy.eyebrow}>
+      <div className="showcase__heading">
+        <span className="eyebrow">{copy.eyebrow}</span>
+        <h2>{copy.title}</h2>
+      </div>
+      <ol className="step-flow__grid">
+        {copy.items.map(([title, body, pill], index) => (
+          <li key={title}>
+            <span className="step-flow__number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span>
+            <h3>{title}</h3>
+            <p>{body}</p>
+            <span className="step-flow__pill">{pill}</span>
+          </li>
+        ))}
+      </ol>
+    </section>
+  )
+}
+
+function StatStrip() {
+  const { allEvents, t } = useContext(AppContext)
+  const copy = t.home.stats
+  const stats = [
+    [resources.length, copy.sourced],
+    [upcomingEvents(allEvents).length, copy.events],
+    [QUALITY_STATS.tests, copy.tests],
+  ]
+  return (
+    <section className="stat-strip section" aria-label={copy.eyebrow}>
+      <span className="eyebrow">{copy.eyebrow}</span>
+      <div className="stat-strip__grid">
+        {stats.map(([value, label]) => <div key={label}><strong>{value}</strong><span>{label}</span></div>)}
+      </div>
+      <div className="stat-strip__links">
+        <Link to="/about#metrics">{copy.numbersLink} <ArrowRight size={15} /></Link>
+        <Link to="/about#sources">{t.trust.link} <ArrowRight size={15} /></Link>
+      </div>
+    </section>
   )
 }
 
@@ -576,26 +908,23 @@ function HeroSearch() {
 
 function HomePage() {
   const { t, language } = useContext(AppContext)
+  const hero = t.home.h1
   return (
     <>
-      <section className="hero">
-        <Townscape />
-        <div className="hero__content">
-          <span className="eyebrow"><MapPin size={15} /> {t.location}</span>
-          <h1>{language === 'es' ? <>Encuentre apoyo. Participe.<br />Siéntase en casa.</> : <>Find support. Join in.<br />Feel at home.</>}</h1>
-          <p>{t.heroSub}</p>
-          <HeroSearch />
-          <div className="popular-searches"><strong>{language === 'en' ? 'Popular searches:' : 'Búsquedas populares:'}</strong>{t.popularSearches.map((item) => <Link key={item} to={`/resources?q=${encodeURIComponent(item)}`}>{item}</Link>)}</div>
+      <section className="home-hero">
+        <div className="home-hero__inner section">
+          <div className="home-hero__copy">
+            <span className="eyebrow home-hero__eyebrow"><MapPin size={15} /> {t.location}</span>
+            <h1>{hero.lead} <em>{hero.accent}</em> {hero.end}</h1>
+            <p className="home-hero__sub">{t.heroSub}</p>
+            <HeroSearch />
+            <p className="home-hero__reassure"><ShieldCheck size={15} /> {t.home.reassure}</p>
+            <div className="popular-searches"><strong>{language === 'en' ? 'Popular searches:' : 'Búsquedas populares:'}</strong>{t.popularSearches.map((item) => <Link key={item} to={`/resources?q=${encodeURIComponent(item)}`}>{item}</Link>)}</div>
+          </div>
+          <HeroLivePanel />
         </div>
       </section>
-      <section className="section home-location distance-bar" aria-labelledby="home-location-title">
-        <div className="home-location__intro">
-          <span className="eyebrow">{t.homeLocation.eyebrow}</span>
-          <h2 id="home-location-title">{t.homeLocation.title}</h2>
-          <p>{t.homeLocation.intro}</p>
-        </div>
-        <LocationPicker compact labels={t.distance} />
-      </section>
+      <GapRow />
       <UrgentBand />
       <section className="section category-section">
         <div className="section-heading"><div><span className="eyebrow">For every stage of life</span><h2>{t.explore}</h2><p>{t.exploreSub}</p></div><Link to="/resources">{t.viewAll}<ArrowRight size={17} /></Link></div>
@@ -606,18 +935,10 @@ function HomePage() {
           })}
         </div>
       </section>
-      <section className="section home-grid">
-        <div className="guide-feature">
-          <div className="guide-copy"><span className="feature-icon"><Compass /></span><h2>{t.guide}</h2><p>{t.guideSub}</p><Link className="button button--primary" to="/finder">Start the guided finder <ArrowRight size={18} /></Link></div>
-          <WayfindingSign />
-        </div>
-        <FeaturedResource />
-        <div className="home-grid__side">
-          <SavedPreview />
-          <EventsPreview />
-        </div>
-      </section>
-      <section className="trust-strip"><ShieldCheck /><div><strong>{t.trust.title}</strong><span>{t.trust.body}</span></div><Link to="/about#sources">{t.trust.link} <ArrowRight size={17} /></Link></section>
+      <Showcase />
+      <RadiusExplorer />
+      <StepFlow />
+      <StatStrip />
     </>
   )
 }
@@ -632,48 +953,6 @@ function UrgentBand() {
       </div>
       <Link className="button button--outline-danger" to="/urgent">View all urgent help <ArrowRight size={17} /></Link>
     </section>
-  )
-}
-
-function WayfindingSign() {
-  return (
-    <div className="wayfinding" aria-hidden="true">
-      <div className="wayfinding__foliage"><Leaf /><Leaf /><Leaf /></div>
-      <span>ANSWERS <ArrowRight /></span><span>SUPPORT <ArrowRight /></span><span>OPPORTUNITIES <ArrowRight /></span><span>A STRONGER<br />TOMORROW <ArrowRight /></span><i />
-    </div>
-  )
-}
-
-function FeaturedResource() {
-  const { t, language } = useContext(AppContext)
-  const resource = resources.find((item) => item.id === 'common-heart')
-  return (
-    <article className="featured-resource">
-      <div className="feature-kicker"><span><Sparkles size={17} /> Featured resource</span><SourceBadge /></div>
-      <h2>{resource.name}</h2>
-      <p>{language === 'es' ? resource.descriptionEs : resource.description}</p>
-      <div className="resource-meta"><span><MapPin /> {resource.location}</span><DistanceTag item={resource} labels={t.distance} /><span><Clock3 /> {resource.hours}</span></div>
-      <div className="featured-resource__footer"><Link className="button button--primary" to={`/resources/${resource.id}`}>{t.viewDetails} <ArrowRight size={17} /></Link><span><Info size={16} /> {t.checked} {formatVerificationDate(resource.verified, language)}</span></div>
-    </article>
-  )
-}
-
-function SavedPreview() {
-  const { saved, t } = useContext(AppContext)
-  const savedMessage = saved.length === 1
-    ? t.savedPreview.one
-    : saved.length > 1
-      ? t.savedPreview.many.replace('{count}', saved.length)
-      : t.savedPreview.empty
-  return (
-    <div className="saved-preview"><Bookmark /><div><h2>{t.savedPreview.title}</h2><p>{savedMessage}</p><Link to="/saved">{t.savedPreview.view} <ArrowRight size={16} /></Link></div></div>
-  )
-}
-
-function EventsPreview() {
-  const { allEvents, t } = useContext(AppContext)
-  return (
-    <div className="events-preview"><div className="mini-heading"><h2><CalendarDays /> {t.upcoming}</h2><Link to="/events">View all</Link></div>{upcomingEvents(allEvents).sort((a, b) => a.date.localeCompare(b.date)).slice(0, 3).map((event) => <EventRow key={event.id} event={event} />)}</div>
   )
 }
 
