@@ -5,7 +5,7 @@ import {
 } from 'lucide-react'
 import { categories, events, resources, sourceNotes, urgentLinks } from './data'
 import { canReport, isHidden, reportBlockedReason, visibleEvents } from './moderation'
-import { applyExtractedFields, buildIcs, eventInterests, getRecommendationReason, rankEventsForUser, todayISO, upcomingEvents } from './eventUtils'
+import { applyExtractedFields, buildIcs, eventInterests, expandEvents, getRecommendationReason, rankEventsForUser, todayISO, upcomingEvents } from './eventUtils'
 import { extractEventFields } from './assist.js'
 import { SITE_HOME_TITLE, SITE_NAME, SITE_TAGLINE, pageTitle } from './siteConfig'
 import {
@@ -316,8 +316,10 @@ function App() {
     interests: profile?.interests || [],
     personalized: profile?.personalized !== false,
   } : null
+  /* Recurring town meetings become dated listings here, so the calendar stays
+     populated as events pass instead of emptying out. */
   const allEvents = useMemo(
-    () => visibleEvents([...events, ...postedEvents], authUser?.uid),
+    () => visibleEvents([...expandEvents(events), ...postedEvents], authUser?.uid),
     [postedEvents, authUser?.uid],
   )
 

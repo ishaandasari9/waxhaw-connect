@@ -29,9 +29,19 @@ describe('community resource data', () => {
 
   it('keeps event links traceable and dates valid', () => {
     for (const event of events) {
-      expect(Number.isNaN(Date.parse(`${event.date}T12:00:00`))).toBe(false)
+      /* A listing carries either a single date or a repeating schedule. */
+      if (event.recurrence) {
+        expect(event.recurrence.week).toBeGreaterThanOrEqual(1)
+        expect(event.recurrence.week).toBeLessThanOrEqual(4)
+        expect(event.recurrence.weekday).toBeGreaterThanOrEqual(0)
+        expect(event.recurrence.weekday).toBeLessThanOrEqual(6)
+        expect(event.date).toBeUndefined()
+      } else {
+        expect(Number.isNaN(Date.parse(`${event.date}T12:00:00`))).toBe(false)
+      }
       expect(event.sourceUrl.startsWith('https://')).toBe(true)
       expect(event.location).toBeTruthy()
+      expect(event.descriptionEs.length).toBeGreaterThan(20)
     }
   })
 })

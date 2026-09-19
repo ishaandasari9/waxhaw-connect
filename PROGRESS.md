@@ -2,7 +2,7 @@
 
 Last updated: September 18, 2026 (chunk 3)
 Base commit for chunk 1: `eeeab23` (Planner: free-tier search model and fallback)
-Tests: 66 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark, desktop and phone.
+Tests: 71 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark, desktop and phone.
 
 ## Done
 
@@ -24,6 +24,12 @@ Tests: 66 passing. axe (WCAG 2.2 AA): 0 violations on every page, light and dark
 
 Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxhaw-dark-mode.patch`, `waxhaw-distance.patch`. `waxhaw-all-changes.patch` combines all three.
 
+## Before the March competition
+
+- [ ] Add more real community events. The five town meetings renew themselves, but festivals and one-off events need adding by hand, and anything dated in 2026 will have passed.
+- [ ] Re-run `npm run geocode` so the two new addresses (Waxhaw Downtown Park and Town Hall) get exact coordinates.
+- [ ] Check the library address question below.
+
 ## Your to-dos (no Claude usage needed)
 
 - [x] Apply the patches and push to `main`
@@ -40,7 +46,7 @@ Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxha
 | # | Issue | Size | Status |
 |---|---|---|---|
 | 1 | Past events still show on the calendar (the Sept 15 meeting is at the top) | S | Done (chunk 1) |
-| 2 | Only 4 official events | M (research) | Open |
+| 2 | Only 4 official events | M (research) | Done (chunk 5) |
 | 3 | `.ics` files are missing UID and DTSTAMP, ignore the start time, and don't escape commas | S | Done (chunk 1) |
 | 4 | The post form's minimum date uses UTC, so same-day events are blocked after 8pm Eastern | S | Done (chunk 1) |
 | 5 | The paste-a-flyer parser is built but not connected to the post form | S | Done (chunk 1) |
@@ -56,7 +62,7 @@ Patch files, applied in this order: `waxhaw-assistant-and-planner.patch`, `waxha
 2. ~~**Moderation:** #7~~ Done Sept 18. Residents can report a neighbor-posted listing; three different people hide it from the public calendar.
 3. ~~**Performance and offline:** #8 and #9~~ Done Sept 18. Fonts are bundled, every color has a hex fallback, the app has real icons, and Firebase waits for an idle moment.
 4. ~~**Metrics:** #10~~ Done Sept 18. The About page now computes its own figures, reports test and accessibility results, and measures Core Web Vitals on the reader's device. The one target currently missed is the number of upcoming events, which chunk 5 fixes.
-5. **Content:** #2 plus the directory gaps (legal aid, newcomer and language support, volunteering, faith and civic groups, pets)
+5. ~~**Content:** #2~~ Done Sept 19. Added Movie In The Park plus five recurring town meetings taken from the published schedule, so the calendar refills itself instead of emptying as events pass. The directory gaps (legal aid, newcomer and language support, volunteering, faith and civic groups, pets) are still open and are research, not code.
 6. ~~**Spanish:** #6~~ Done Sept 18, with Codex doing the bulk and the urgent, sign-in and About pages finished afterwards.
 7. **Backlog features, if time allows:**
    - A "Report outdated info" button on each resource

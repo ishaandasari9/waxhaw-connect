@@ -164,3 +164,54 @@ export function applyExtractedFields(form, fields = {}, today = todayISO()) {
   const wanted = ['title', 'description', 'location', 'category', 'date', 'time']
   return { form: next, filled, missing: wanted.filter((field) => !filled.includes(field)) }
 }
+
+/* ---------- Recurring meetings ---------- */
+
+/**
+ * Some listings are a standing schedule rather than a single date: the Board of
+ * Commissioners meets the second Tuesday of every month, and will still be
+ * meeting next spring. Storing the rule instead of a date means the calendar
+ * keeps itself populated instead of emptying out as events pass.
+ *
+ * Each generated listing says it comes from a standing schedule and links to
+ * the town calendar, because a meeting can still be moved or cancelled.
+ */
+export function nthWeekdayOfMonth(year, month, weekday, week) {
+  const firstOfMonth = new Date(Date.UTC(year, month - 1, 1))
+  const shift = (weekday - firstOfMonth.getUTCDay() + 7) % 7
+  const day = 1 + shift + (week - 1) * 7
+  const candidate = new Date(Date.UTC(year, month - 1, day))
+  if (candidate.getUTCMonth() !== month - 1) return null
+  return candidate.toISOString().slice(0, 10)
+}
+
+/**
+ * The next `count` dates a monthly rule produces, starting from `today`.
+ * One by default: the calendar shows the next meeting of each body, and the
+ * following one appears by itself once that date passes. Listing several
+ * months at once would bury the community events under board meetings.
+ */
+export function nextOccurrences(rule, { today = todayISO(), count = 1 } = {}) {
+  const [year, month] = today.split('-').map(Number)
+  const dates = []
+  for (let step = 0; step < count + 12 && dates.length < count; step += 1) {
+    const cursor = new Date(Date.UTC(year, month - 1 + step, 1))
+    const date = nthWeekdayOfMonth(cursor.getUTCFullYear(), cursor.getUTCMonth() + 1, rule.weekday, rule.week)
+    if (date && date >= today) dates.push(date)
+  }
+  return dates
+}
+
+export function expandRecurring(template, options = {}) {
+  return nextOccurrences(template.recurrence, options).map((date) => ({
+    ...template,
+    id: `${template.id}-${date}`,
+    date,
+    fromSchedule: true,
+  }))
+}
+
+/** Turns a mixed list of dated and recurring listings into dated listings. */
+export function expandEvents(eventItems, options = {}) {
+  return eventItems.flatMap((item) => (item.recurrence ? expandRecurring(item, options) : [item]))
+}

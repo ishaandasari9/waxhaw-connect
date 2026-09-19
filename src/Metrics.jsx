@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react'
 import { BadgeCheck, CircleAlert, Gauge, Minus } from 'lucide-react'
 import { events, resources } from './data'
+import { expandEvents } from './eventUtils'
 import { QUALITY_STATS } from './qualityStats'
 import { VITALS, directoryMetrics, formatVital, vitalMet } from './metrics'
 import { observeVitals } from './webVitals'
@@ -43,7 +44,7 @@ export default function MetricsPanel({ copy }) {
   useEffect(() => observeVitals((id, value) => setVitals((current) => ({ ...current, [id]: value }))), [])
 
   const spanish = copy.target === 'Objetivo'
-  const directory = directoryMetrics(resources, events).map((row, index) => ({
+  const directory = directoryMetrics(resources, expandEvents(events)).map((row, index) => ({
     ...row,
     label: copy.directoryRows[index].label,
     note: copy.directoryRows[index].note,

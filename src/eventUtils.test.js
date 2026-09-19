@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { applyExtractedFields, buildIcs, getRecommendationReason, isUpcoming, parseEventTime, rankEventsForUser, todayISO, upcomingEvents } from './eventUtils'
+import { applyExtractedFields, buildIcs, expandEvents, getRecommendationReason, isUpcoming, nextOccurrences, nthWeekdayOfMonth, parseEventTime, rankEventsForUser, todayISO, upcomingEvents } from './eventUtils'
 
 const sampleEvents = [
   { id: 'civic', title: 'Town meeting', category: 'Civic', date: '2026-09-12' },
@@ -119,5 +119,36 @@ describe('filling the form from a pasted flyer', () => {
   it('leaves anything the resident already typed in place when nothing is found', () => {
     const typed = { ...blank, title: 'My event', location: 'My street' }
     expect(applyExtractedFields(typed, {}, '2026-09-18').form).toEqual(typed)
+  })
+})
+
+describe('recurring meetings', () => {
+  it('finds the nth weekday of a month', () => {
+    expect(nthWeekdayOfMonth(2026, 10, 2, 2)).toBe('2026-10-13')
+    expect(nthWeekdayOfMonth(2026, 10, 4, 2)).toBe('2026-10-08')
+    expect(nthWeekdayOfMonth(2026, 9, 6, 1)).toBe('2026-09-05')
+  })
+
+  it('returns nothing when a month has no such week', () => {
+    expect(nthWeekdayOfMonth(2026, 2, 0, 5)).toBeNull()
+  })
+
+  it('skips dates that have already passed this month', () => {
+    expect(nextOccurrences({ week: 2, weekday: 2 }, { today: '2026-09-19', count: 2 })).toEqual(['2026-10-13', '2026-11-10'])
+    expect(nextOccurrences({ week: 4, weekday: 2 }, { today: '2026-09-19', count: 1 })).toEqual(['2026-09-22'])
+  })
+
+  it('still fills the calendar months from now, which a fixed date cannot', () => {
+    expect(nextOccurrences({ week: 2, weekday: 2 }, { today: '2027-03-01', count: 2 })).toEqual(['2027-03-09', '2027-04-13'])
+  })
+
+  it('expands a schedule into dated listings and leaves one-off events alone', () => {
+    const template = { id: 'boc', title: 'Board meeting', recurrence: { week: 2, weekday: 2 } }
+    const single = { id: 'parade', title: 'Parade', date: '2026-12-13' }
+    const expanded = expandEvents([single, template], { today: '2026-09-19', count: 2 })
+    expect(expanded).toHaveLength(3)
+    expect(expanded[0]).toBe(single)
+    expect(expanded[1]).toMatchObject({ id: 'boc-2026-10-13', date: '2026-10-13', title: 'Board meeting', fromSchedule: true })
+    expect(new Set(expanded.map((item) => item.id)).size).toBe(3)
   })
 })
